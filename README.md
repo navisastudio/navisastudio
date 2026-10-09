@@ -2,7 +2,7 @@
 
 A simple dashboard for a working creative: track shoots across every role, keep a rate card, archive designs and CMT forms, and make GST invoices as PDFs.
 
-**Open it here:** https://YOUR-GITHUB-USERNAME.github.io/studio-ledger/
+**Open it here:** https://navisastudio.github.io
 
 No sign-up, no install. It works on a laptop or a phone.
 
@@ -37,7 +37,7 @@ It then opens like an app.
 
 ---
 
-## ⚠️ Where your data lives (please read)
+## Where your data lives (please read)
 
 Everything is saved **inside the browser on the device you're using**. Nothing is sent to a server, so it stays private, but:
 
@@ -53,9 +53,7 @@ Everything is saved **inside the browser on the device you're using**. Nothing i
 It's a static site: `index.html` plus `vendor/jspdf.umd.min.js` (PDF generation, MIT license). There's no build step and no server.
 
 **To host it on GitHub Pages:**
-1. Create a public repo named `studio-ledger` and upload these files to its root.
-2. Go to repo **Settings → Pages → Build and deployment**, choose **Deploy from a branch**, pick `main` and `/ (root)`, then click **Save**.
-3. After a minute or two the site is live at `https://YOUR-GITHUB-USERNAME.github.io/studio-ledger/`. Put that link at the top of this README.
+
 
 To update it, edit `index.html` and commit. Her data isn't affected, since it lives in her browser, not in the repo.
 
