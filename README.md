@@ -1,8 +1,8 @@
 # Studio Ledger
 
-A simple dashboard for a working creative: track shoots across every role, keep a rate card, archive designs and CMT forms, and make GST invoices as PDFs.
+A simple dashboard for a working creative: track shoots across every role, keep a rate card, archive designs and CMT forms, and make SST-ready invoices as PDFs (Malaysia, in RM).
 
-**Open it here:** https://navisastudio.github.io
+**Open it here:** https://YOUR-GITHUB-USERNAME.github.io/studio-ledger/
 
 No sign-up, no install. It works on a laptop or a phone.
 
@@ -10,7 +10,7 @@ No sign-up, no install. It works on a laptop or a phone.
 
 ## Using it
 
-**Start with Settings.** Add your name, address, phone, email, GSTIN and PAN (if you have them), bank details and UPI ID. These print on every invoice. You can also set your invoice number prefix, GST rate, and how many days clients get to pay.
+**Start with Settings.** Add your name, address, phone, email, SST registration number, SSM registration number and TIN (if you have them), bank details and DuitNow ID. These print on every invoice. You can also set your invoice number prefix, SST rate (leave it at 0 if you're not SST-registered), and how many days clients get to pay.
 
 **Rates.** Set your current rate for each role: artist, model, creative director, art director, fashion stylist, fashion designer, set designer, prop rentals. Once you've logged a few jobs, each card shows what you've actually charged (average, range, last time) so you can tell when it's time to raise a rate.
 
@@ -24,9 +24,9 @@ Jobs sort themselves into **Upcoming**, **On now**, and **Past** by their dates.
 
 **Library.** Your archive of designs, CMT forms, mood boards, reference images, and tech packs. CMT forms have fields for fabric, consumption, cutting, making, and trims, plus a total cost to make. Use **Reuse as new** to copy an old design as the starting point for a new one.
 
-**Invoices.** Open a job and tap **Create invoice**. The lines carry over. Add a discount, GST (shown as CGST + SGST, or IGST), and any advance received, then **Download PDF**. Change the status to Sent, Partly paid, or Paid as money comes in.
+**Invoices.** Open a job and tap **Create invoice**. The lines carry over. Add a discount, SST if you're registered, and any advance received, then **Download PDF**. Change the status to Sent, Partly paid, or Paid as money comes in.
 
-**Overview.** What's on now, what's next, what you're owed, what's overdue, wrapped jobs you haven't invoiced yet, and which roles earn you the most this financial year.
+**Overview.** What's on now, what's next, what you're owed, what's overdue, wrapped jobs you haven't invoiced yet, and which roles earn you the most this year.
 
 ### On your phone
 Open the link, then:
@@ -37,7 +37,7 @@ It then opens like an app.
 
 ---
 
-## Where your data lives (please read)
+## ⚠️ Where your data lives (please read)
 
 Everything is saved **inside the browser on the device you're using**. Nothing is sent to a server, so it stays private, but:
 
@@ -53,7 +53,9 @@ Everything is saved **inside the browser on the device you're using**. Nothing i
 It's a static site: `index.html` plus `vendor/jspdf.umd.min.js` (PDF generation, MIT license). There's no build step and no server.
 
 **To host it on GitHub Pages:**
-
+1. Create a public repo named `studio-ledger` and upload these files to its root.
+2. Go to repo **Settings → Pages → Build and deployment**, choose **Deploy from a branch**, pick `main` and `/ (root)`, then click **Save**.
+3. After a minute or two the site is live at `https://YOUR-GITHUB-USERNAME.github.io/studio-ledger/`. Put that link at the top of this README.
 
 To update it, edit `index.html` and commit. Her data isn't affected, since it lives in her browser, not in the repo.
 

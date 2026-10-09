@@ -369,16 +369,17 @@ const $ = s => document.querySelector(s);
 const esc = v => String(v ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const newId = () => Date.now().toString(36) + Math.random().toString(36).slice(2,8);
 const num = v => { const n = parseFloat(v); return isFinite(n) ? n : 0; };
-const inr = new Intl.NumberFormat('en-IN',{style:'currency',currency:'INR',maximumFractionDigits:0});
-const money = n => inr.format(Math.round(num(n)));
-const pdfMoney = n => 'Rs. ' + num(n).toLocaleString('en-IN',{minimumFractionDigits:2,maximumFractionDigits:2});
+const LOCALE='en-MY', CUR='MYR';
+const cur = new Intl.NumberFormat(LOCALE,{style:'currency',currency:CUR,minimumFractionDigits:0,maximumFractionDigits:0});
+const money = n => cur.format(Math.round(num(n)));
+const pdfMoney = n => 'RM ' + num(n).toLocaleString(LOCALE,{minimumFractionDigits:2,maximumFractionDigits:2});
 const pad = n => String(n).padStart(2,'0');
 const isoDate = d => `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
 const today = () => isoDate(new Date());
 const addDays = (iso, n) => { const d = new Date(iso+'T00:00:00'); d.setDate(d.getDate()+n); return isoDate(d); };
-const fmtDate = iso => iso ? new Date(iso+'T00:00:00').toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'}) : '';
-const dayParts = iso => { if(!iso) return {d:'–',m:'No date'}; const dt = new Date(iso+'T00:00:00'); return {d:dt.getDate(), m:dt.toLocaleDateString('en-IN',{month:'short',year:'2-digit'})}; };
-function fyStart(){ const d=new Date(); const y = d.getMonth()>=3 ? d.getFullYear() : d.getFullYear()-1; return `${y}-04-01`; }
+const fmtDate = iso => iso ? new Date(iso+'T00:00:00').toLocaleDateString(LOCALE,{day:'numeric',month:'short',year:'numeric'}) : '';
+const dayParts = iso => { if(!iso) return {d:'–',m:'No date'}; const dt = new Date(iso+'T00:00:00'); return {d:dt.getDate(), m:dt.toLocaleDateString(LOCALE,{month:'short',year:'2-digit'})}; };
+function fyStart(){ return `${new Date().getFullYear()}-01-01`; }
 function toast(msg){ const t=$('#toast'); t.textContent=msg; t.classList.add('on'); clearTimeout(toast._t); toast._t=setTimeout(()=>t.classList.remove('on'),2400); }
 function clone(o){ return JSON.parse(JSON.stringify(o)); }
 
@@ -597,14 +598,14 @@ function vOverview(){
     return `<button class="feature" data-act="job" data-id="${feat.id}"><div class="when">${when}${feat.callTime?`, call time ${esc(feat.callTime)}`:''}</div><div class="t">${esc(feat.title||'Untitled job')}</div><div class="meta">${esc([clientName(feat.clientId), feat.location].filter(Boolean).join(', '))}</div><div class="chips">${chips(feat.items)}</div></button>`; })()
     : `<div class="feature empty"><div class="when" style="font-size:12px;letter-spacing:.24em;text-transform:uppercase;color:var(--gold-hi)">Dark tonight</div><div class="t" style="font-size:34px;margin-top:10px">Nothing booked yet.</div><p class="sub">Add your next shoot and it'll be up in lights.</p><div style="margin-top:auto"><button class="btn primary" data-act="newjob">Add a job</button></div></div>`;
 
-  return `<div class="head"><div><h1>${greeting()}</h1><p class="sub">${new Date().toLocaleDateString('en-IN',{weekday:'long',day:'numeric',month:'long'})}</p></div><div style="display:flex;gap:8px"><button class="btn" data-act="newinv">New invoice</button><button class="btn primary" data-act="newjob">New job</button></div></div>
+  return `<div class="head"><div><h1>${greeting()}</h1><p class="sub">${new Date().toLocaleDateString(LOCALE,{weekday:'long',day:'numeric',month:'long'})}</p></div><div style="display:flex;gap:8px"><button class="btn" data-act="newinv">New invoice</button><button class="btn primary" data-act="newjob">New job</button></div></div>
   ${(S.jobs.length||S.invoices.length) && (!UI.lastBackup || (new Date(today())-new Date(UI.lastBackup))/864e5>14) ? `<div class="panel" style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:18px;border-color:var(--accent)"><span>${UI.lastBackup?`Your last backup was ${fmtDate(UI.lastBackup)}.`:"You haven't backed up yet."} Everything lives on this device, so keep a copy somewhere safe.</span><button class="btn sm" data-act="backup">Download backup</button></div>`:''}
   <div class="now">${featHTML}
     <div class="panel"><h2>Up next</h2><div class="rows">${up.filter(j=>j!==feat).slice(0,4).map(j=>{const p=dayParts(j.start);return `<button class="row" data-act="job" data-id="${j.id}" style="grid-template-columns:52px 1fr auto"><div class="date"><div class="d">${p.d}</div><div class="m">${esc(p.m)}</div></div><div style="min-width:0"><div class="rt">${esc(j.title||'Untitled')}</div><div class="rm">${esc(clientName(j.clientId))}</div></div><div class="amt">${money(itemsTotal(j.items))}</div></button>`}).join('') || '<div class="empty-note">No other upcoming jobs.</div>'}</div></div>
   </div>
   <div class="grid g4" style="margin-bottom:18px">
     <div class="panel stat"><div class="k">Waiting to be paid</div><div class="v">${money(outstanding)}</div><div class="n">${overdue?`${overdue} overdue`:'Nothing overdue'}</div></div>
-    <div class="panel stat"><div class="k">Received this financial year</div><div class="v">${money(received)}</div><div class="n">Since ${fmtDate(fy)}</div></div>
+    <div class="panel stat"><div class="k">Received this year</div><div class="v">${money(received)}</div><div class="n">Since ${fmtDate(fy)}</div></div>
     <div class="panel stat"><div class="k">Booked ahead</div><div class="v">${money(booked)}</div><div class="n">${cur.length+up.length} job${cur.length+up.length===1?'':'s'} on now or coming up</div></div>
     <div class="panel stat"><div class="k">Wrapped, not invoiced</div><div class="v">${notInv}</div><div class="n">${notInv?'<a href="#" data-act="view" data-v="jobs" data-f="past">See them</a>':'All caught up'}</div></div>
   </div>
@@ -656,12 +657,12 @@ function vRates(){
     return `<form class="panel rate" data-form="rate" data-k="${r.k}">
       <div class="top"><h3 style="display:flex;align-items:center;gap:8px"><span class="dot" style="background:${roleColor(r.k)};width:10px;height:10px"></span>${esc(r.n)}</h3>${diff!==null?`<span class="badge ${diff>=0?'b-ok':'b-warn'}">${diff>=0?'+':''}${diff.toFixed(0)}% vs your average</span>`:''}</div>
       <div class="fgrid">
-        <label class="f">Current rate (₹)<input class="inp" name="rate" inputmode="decimal" value="${esc(c.rate)}" placeholder="0"></label>
+        <label class="f">Current rate (RM)<input class="inp" name="rate" inputmode="decimal" value="${esc(c.rate)}" placeholder="0"></label>
         <label class="f">Unit<select class="inp" name="unit">${UNITS.map(u=>`<option ${u===c.unit?'selected':''}>${u}</option>`).join('')}</select></label>
-        <label class="f">Lowest you'll accept (₹)<input class="inp" name="minRate" inputmode="decimal" value="${esc(c.minRate)}" placeholder="Optional"></label>
+        <label class="f">Lowest you'll accept (RM)<input class="inp" name="minRate" inputmode="decimal" value="${esc(c.minRate)}" placeholder="Optional"></label>
         <label class="f">Notes<input class="inp" name="notes" value="${esc(c.notes)}" placeholder="e.g. +20% for outstation"></label>
       </div>
-      <div class="facts">${st?`<div>Times charged<b>${st.count}</b></div><div>Average<b>${money(st.avg)}</b></div><div>Range<b>${money(st.min)} to ${money(st.max)}</b></div><div>Last<b>${money(st.last.rate)}</b></div><div>Earned this FY<b>${money(st.earned)}</b></div>`:'<div>No past jobs with this role yet.</div>'}</div>
+      <div class="facts">${st?`<div>Times charged<b>${st.count}</b></div><div>Average<b>${money(st.avg)}</b></div><div>Range<b>${money(st.min)} to ${money(st.max)}</b></div><div>Last<b>${money(st.last.rate)}</b></div><div>Earned this year<b>${money(st.earned)}</b></div>`:'<div>No past jobs with this role yet.</div>'}</div>
       ${(c.history||[]).length?`<div class="hist">Previous rates: ${c.history.slice(-4).reverse().map(h=>`${money(h.rate)} ${esc(h.unit)} until ${fmtDate(h.until)}`).join('; ')}</div>`:''}
       <div style="margin-top:12px;text-align:right"><button class="btn sm" type="submit">Save rate</button></div>
     </form>`;}).join('')}</div>`;
@@ -690,16 +691,15 @@ function vSettings(){
     <fieldset style="margin-top:0"><legend>You</legend><div class="fgrid">
       ${f('firstName','First name (for the greeting)')}${f('businessName','Name on invoices','Your name or studio name')}
       <label class="f full">Address<textarea class="inp" name="address" style="min-height:64px">${esc(s.address)}</textarea></label>
-      ${f('phone','Phone')}${f('email','Email')}${f('gstin','GSTIN','Leave blank if not registered')}${f('pan','PAN')}
+      ${f('phone','Phone')}${f('email','Email')}${f('gstin','SST registration no.','Leave blank if not registered')}${f('pan','SSM / business registration no.')}${f('tin','Tax identification no. (TIN)')}
     </div></fieldset>
     <fieldset><legend>Getting paid</legend><div class="fgrid">
-      ${f('bankName','Bank')}${f('accountName','Account holder')}${f('accountNumber','Account number')}${f('ifsc','IFSC')}${f('upi','UPI ID','', true)}
+      ${f('bankName','Bank')}${f('accountName','Account holder')}${f('accountNumber','Account number')}${f('ifsc','SWIFT code','For overseas clients')}${f('upi','DuitNow ID','Phone, IC or business no.')}
     </div></fieldset>
     <fieldset><legend>Invoice defaults</legend><div class="fgrid">
       ${f('invoicePrefix','Number prefix','INV')}
       <label class="f">Payment due after (days)<input class="inp" name="dueDays" inputmode="numeric" value="${esc(s.dueDays ?? 15)}"></label>
-      <label class="f">GST rate (%)<input class="inp" name="taxRate" inputmode="decimal" value="${esc(s.taxRate ?? '')}" placeholder="0 if not registered"></label>
-      <label class="f">GST shown as<select class="inp" name="taxSplit"><option value="split" ${s.taxSplit!=='igst'?'selected':''}>CGST + SGST (same state)</option><option value="igst" ${s.taxSplit==='igst'?'selected':''}>IGST (other state)</option></select></label>
+      <label class="f">SST rate (%)<input class="inp" name="taxRate" inputmode="decimal" value="${esc(s.taxRate ?? '')}" placeholder="0 if not registered"><span class="hint">8% for most services, 6% for rental and leasing</span></label>
       <label class="f full">Default notes and terms<textarea class="inp" name="terms">${esc(s.terms)}</textarea></label>
     </div></fieldset>
     <div style="margin-top:20px;display:flex;gap:8px;justify-content:space-between;flex-wrap:wrap"><span style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn" type="button" data-act="backup">Download a backup</button><button class="btn" type="button" data-act="restore">Restore from backup</button><input type="file" id="restoreFile" accept="application/json,.json" data-in="restore" hidden></span><button class="btn primary" type="submit">Save settings</button></div>
@@ -720,7 +720,7 @@ function clientSelect(sel){
   <input class="inp" name="newClient" placeholder="New client's name" style="display:none;margin-top:6px">`;
 }
 function itemsEditor(items){
-  return `<div class="items-wrap"><table class="items"><thead><tr><th style="width:24%">Role</th><th>What</th><th style="width:9%">Qty</th><th style="width:17%">Unit</th><th style="width:14%">Rate (₹)</th><th style="width:12%;text-align:right">Amount</th><th></th></tr></thead>
+  return `<div class="items-wrap"><table class="items"><thead><tr><th style="width:24%">Role</th><th>What</th><th style="width:9%">Qty</th><th style="width:17%">Unit</th><th style="width:14%">Rate (RM)</th><th style="width:12%;text-align:right">Amount</th><th></th></tr></thead>
   <tbody id="itemsBody">${(items.length?items:[{}]).map(itemRow).join('')}</tbody></table></div>
   <div style="display:flex;justify-content:space-between;align-items:center;margin-top:6px"><button class="btn sm" type="button" data-act="additem">Add line</button><div class="amt" id="itemsSum"></div></div>`;
 }
@@ -745,7 +745,7 @@ function recalcItems(){
   const s=$('#itemsSum'); if(s) s.textContent = 'Total '+money(sum);
   if(D && D.kind==='inv') recalcInvTotals();
 }
-function expRow(e={}){ return `<tr class="erow"><td><input class="inp" name="edesc" value="${esc(e.desc)}" placeholder="Fabric, travel, props hire…"></td><td style="width:28%"><input class="inp" name="eamt" inputmode="decimal" value="${esc(e.amount)}" placeholder="₹"></td><td style="width:40px"><button type="button" class="x" data-act="delrow" aria-label="Remove">×</button></td></tr>`; }
+function expRow(e={}){ return `<tr class="erow"><td><input class="inp" name="edesc" value="${esc(e.desc)}" placeholder="Fabric, travel, props hire…"></td><td style="width:28%"><input class="inp" name="eamt" inputmode="decimal" value="${esc(e.amount)}" placeholder="RM"></td><td style="width:40px"><button type="button" class="x" data-act="delrow" aria-label="Remove">×</button></td></tr>`; }
 function filesBlock(files){
   return `<div class="files" id="files">${files.map((f,i)=>`<div class="file"><div class="th">${(f.type||'').startsWith('image/')?`<img src="${fileURL(f.id)}" alt="">`:`<a href="${fileURL(f.id)}" target="_blank" rel="noopener">PDF</a>`}</div><div class="nm" title="${esc(f.name)}">${esc(f.name)}</div><button type="button" class="x" data-act="delfile" data-i="${i}" aria-label="Remove ${esc(f.name)}">×</button></div>`).join('')}</div>
   <div style="margin-top:10px"><label class="btn sm" style="cursor:pointer">Upload images or PDFs<input type="file" multiple accept="image/*,application/pdf" data-in="upload" hidden></label> <span class="hint" id="uphint"></span></div>`;
@@ -824,7 +824,7 @@ function openInvoice(inv, fromJob){
   if(inv) i = clone(inv);
   else {
     const d = today();
-    i = {id:newId(), number:nextInvoiceNumber(), date:d, due:addDays(d, num(s.dueDays ?? 15) || 15), clientId:'', items:[], discount:0, taxRate:num(s.taxRate), taxSplit:s.taxSplit||'split', paidAmount:0, status:'Draft', notes:s.terms||'', project:''};
+    i = {id:newId(), number:nextInvoiceNumber(), date:d, due:addDays(d, num(s.dueDays ?? 15) || 15), clientId:'', items:[], discount:0, taxRate:num(s.taxRate), paidAmount:0, status:'Draft', notes:s.terms||'', project:''};
     if(fromJob){ i.jobId=fromJob.id; i.clientId=fromJob.clientId; i.project=fromJob.title; i.shootDate=fromJob.start; i.items=clone(fromJob.items||[]); }
   }
   D = {kind:'inv', obj:i, isNew};
@@ -836,10 +836,9 @@ function openInvoice(inv, fromJob){
     <label class="f">Invoice date<input class="inp" type="date" name="date" value="${esc(i.date)}"></label>
     <label class="f">Due<input class="inp" type="date" name="due" value="${esc(i.due)}"></label>
     <div class="full"><fieldset style="margin-top:6px"><legend>Line items</legend>${itemsEditor(i.items||[])}</fieldset></div>
-    <label class="f">Discount (₹)<input class="inp" name="discount" inputmode="decimal" value="${esc(i.discount||'')}" data-in="calc"></label>
-    <label class="f">GST (%)<input class="inp" name="taxRate" inputmode="decimal" value="${esc(i.taxRate||'')}" placeholder="0" data-in="calc"></label>
-    <label class="f">GST shown as<select class="inp" name="taxSplit"><option value="split" ${i.taxSplit!=='igst'?'selected':''}>CGST + SGST</option><option value="igst" ${i.taxSplit==='igst'?'selected':''}>IGST</option></select></label>
-    <label class="f">Received so far, incl. advance (₹)<input class="inp" name="paidAmount" inputmode="decimal" value="${esc(i.paidAmount||'')}" data-in="calc"></label>
+    <label class="f">Discount (RM)<input class="inp" name="discount" inputmode="decimal" value="${esc(i.discount||'')}" data-in="calc"></label>
+    <label class="f">SST (%)<input class="inp" name="taxRate" inputmode="decimal" value="${esc(i.taxRate||'')}" placeholder="0" data-in="calc"></label>
+    <label class="f">Received so far, incl. advance (RM)<input class="inp" name="paidAmount" inputmode="decimal" value="${esc(i.paidAmount||'')}" data-in="calc"></label>
     <label class="f">Date paid<input class="inp" type="date" name="paidDate" value="${esc(i.paidDate)}"></label>
     <div class="full"><div class="totals" id="invTotals"></div></div>
     <label class="f full">Notes and terms<textarea class="inp" name="notes">${esc(i.notes)}</textarea></label>
@@ -852,13 +851,13 @@ function readInvoiceForm(){
   const f = document.querySelector('[data-form=inv]'); if(!f) return D.obj;
   const g = n => (f.querySelector(`[name=${n}]`)||{}).value ?? '';
   return Object.assign(D.obj, {number:g('number').trim(), status:g('status'), project:g('project').trim(), date:g('date'), due:g('due'),
-    items:readItems(), discount:num(g('discount')), taxRate:num(g('taxRate')), taxSplit:g('taxSplit'), paidAmount:num(g('paidAmount')), paidDate:g('paidDate'), notes:g('notes'), updated:new Date().toISOString()});
+    items:readItems(), discount:num(g('discount')), taxRate:num(g('taxRate')), paidAmount:num(g('paidAmount')), paidDate:g('paidDate'), notes:g('notes'), updated:new Date().toISOString()});
 }
 function recalcInvTotals(){
   const f = document.querySelector('[data-form=inv]'); if(!f) return;
   const g = n => f.querySelector(`[name=${n}]`).value;
   const T = invTotals({items:readItems(), discount:g('discount'), taxRate:g('taxRate'), paidAmount:g('paidAmount'), status:g('status')});
-  $('#invTotals').innerHTML = `<div><span>Subtotal</span><span>${money(T.sub)}</span></div>${T.disc?`<div><span>Discount</span><span>−${money(T.disc)}</span></div>`:''}${T.tax?`<div><span>GST ${num(g('taxRate'))}%</span><span>${money(T.tax)}</span></div>`:''}<div class="grand"><span>Total</span><span>${money(T.total)}</span></div>${T.paid?`<div><span>Received</span><span>−${money(T.paid)}</span></div><div class="grand"><span>Balance due</span><span>${money(T.balance)}</span></div>`:''}`;
+  $('#invTotals').innerHTML = `<div><span>Subtotal</span><span>${money(T.sub)}</span></div>${T.disc?`<div><span>Discount</span><span>−${money(T.disc)}</span></div>`:''}${T.tax?`<div><span>SST ${num(g('taxRate'))}%</span><span>${money(T.tax)}</span></div>`:''}<div class="grand"><span>Total</span><span>${money(T.total)}</span></div>${T.paid?`<div><span>Received</span><span>−${money(T.paid)}</span></div><div class="grand"><span>Balance due</span><span>${money(T.balance)}</span></div>`:''}`;
 }
 async function saveInvoice(){
   const i = readInvoiceForm(); const f = document.querySelector('[data-form=inv]');
@@ -869,13 +868,13 @@ async function saveInvoice(){
   try{ await Store.save('invoices', i); D.isNew=false; toast('Invoice saved'); return i; }catch(e){}
 }
 function invoiceHTML(i){
-  const s=S.settings, c=clientById(i.clientId)||{}, T=invTotals(i); const half=i.taxSplit!=='igst';
-  return `<div class="paper"><div class="ptop"><div><h4>${esc(s.businessName||'Your name')}</h4><div class="pmuted" style="white-space:pre-line;margin-top:6px">${esc([s.address,[s.phone,s.email].filter(Boolean).join('   '),s.gstin?'GSTIN '+s.gstin:'',s.pan?'PAN '+s.pan:''].filter(Boolean).join('\n'))}</div></div>
+  const s=S.settings, c=clientById(i.clientId)||{}, T=invTotals(i);
+  return `<div class="paper"><div class="ptop"><div><h4>${esc(s.businessName||'Your name')}</h4><div class="pmuted" style="white-space:pre-line;margin-top:6px">${esc([s.address,[s.phone,s.email].filter(Boolean).join('   '),s.gstin?'SST No. '+s.gstin:'',s.pan?'Reg. No. '+s.pan:'',s.tin?'TIN '+s.tin:''].filter(Boolean).join('\n'))}</div></div>
   <div style="text-align:right"><div style="font-weight:700;font-size:20px;letter-spacing:.04em">INVOICE</div><div>${esc(i.number)}</div><div class="pmuted">Date ${fmtDate(i.date)}</div>${i.due?`<div class="pmuted">Due ${fmtDate(i.due)}</div>`:''}</div></div>
-  <div class="ptop" style="margin-top:22px"><div><div class="pmuted" style="font-size:11px">Bill to</div><div style="font-weight:700">${esc(c.name||'')}</div><div class="pmuted" style="white-space:pre-line">${esc([c.company,c.address,c.email,c.phone,c.gstin?'GSTIN '+c.gstin:''].filter(Boolean).join('\n'))}</div></div>${i.project?`<div style="text-align:right"><div class="pmuted" style="font-size:11px">Project</div><div>${esc(i.project)}</div>${i.shootDate?`<div class="pmuted">Shoot ${fmtDate(i.shootDate)}</div>`:''}</div>`:''}</div>
+  <div class="ptop" style="margin-top:22px"><div><div class="pmuted" style="font-size:11px">Bill to</div><div style="font-weight:700">${esc(c.name||'')}</div><div class="pmuted" style="white-space:pre-line">${esc([c.company,c.address,c.email,c.phone,c.gstin?'SST No. '+c.gstin:''].filter(Boolean).join('\n'))}</div></div>${i.project?`<div style="text-align:right"><div class="pmuted" style="font-size:11px">Project</div><div>${esc(i.project)}</div>${i.shootDate?`<div class="pmuted">Shoot ${fmtDate(i.shootDate)}</div>`:''}</div>`:''}</div>
   <table><thead><tr><th>Description</th><th class="r">Qty</th><th>Unit</th><th class="r">Rate</th><th class="r">Amount</th></tr></thead><tbody>${(i.items||[]).map(it=>`<tr><td><b>${esc(roleOf(it.role).n)}</b>${it.desc?`<div class="pmuted">${esc(it.desc)}</div>`:''}</td><td class="r">${esc(it.qty)}</td><td>${esc(it.unit)}</td><td class="r">${money(it.rate)}</td><td class="r">${money(num(it.qty)*num(it.rate))}</td></tr>`).join('')}</tbody></table>
-  <div class="totals" style="margin-top:14px"><div><span>Subtotal</span><span>${money(T.sub)}</span></div>${T.disc?`<div><span>Discount</span><span>−${money(T.disc)}</span></div>`:''}${T.tax?(half?`<div><span>CGST ${num(i.taxRate)/2}%</span><span>${money(T.tax/2)}</span></div><div><span>SGST ${num(i.taxRate)/2}%</span><span>${money(T.tax/2)}</span></div>`:`<div><span>IGST ${num(i.taxRate)}%</span><span>${money(T.tax)}</span></div>`):''}<div class="grand"><span>Total</span><span>${money(T.total)}</span></div>${T.paid&&i.status!=='Paid'?`<div><span>Received</span><span>−${money(T.paid)}</span></div><div class="grand"><span>Balance due</span><span>${money(T.balance)}</span></div>`:''}${i.status==='Paid'?'<div class="grand"><span>Paid in full</span><span></span></div>':''}</div>
-  ${(s.bankName||s.accountNumber||s.upi)?`<div style="margin-top:20px"><div class="pmuted" style="font-size:11px">Payment details</div><div style="white-space:pre-line">${esc([s.accountName&&'Account name: '+s.accountName, s.bankName&&'Bank: '+s.bankName, s.accountNumber&&'Account no.: '+s.accountNumber, s.ifsc&&'IFSC: '+s.ifsc, s.upi&&'UPI: '+s.upi].filter(Boolean).join('\n'))}</div></div>`:''}
+  <div class="totals" style="margin-top:14px"><div><span>Subtotal</span><span>${money(T.sub)}</span></div>${T.disc?`<div><span>Discount</span><span>−${money(T.disc)}</span></div>`:''}${T.tax?`<div><span>SST ${num(i.taxRate)}%</span><span>${money(T.tax)}</span></div>`:''}<div class="grand"><span>Total</span><span>${money(T.total)}</span></div>${T.paid&&i.status!=='Paid'?`<div><span>Received</span><span>−${money(T.paid)}</span></div><div class="grand"><span>Balance due</span><span>${money(T.balance)}</span></div>`:''}${i.status==='Paid'?'<div class="grand"><span>Paid in full</span><span></span></div>':''}</div>
+  ${(s.bankName||s.accountNumber||s.upi)?`<div style="margin-top:20px"><div class="pmuted" style="font-size:11px">Payment details</div><div style="white-space:pre-line">${esc([s.accountName&&'Account name: '+s.accountName, s.bankName&&'Bank: '+s.bankName, s.accountNumber&&'Account no.: '+s.accountNumber, s.ifsc&&'SWIFT: '+s.ifsc, s.upi&&'DuitNow: '+s.upi].filter(Boolean).join('\n'))}</div></div>`:''}
   ${i.notes?`<div style="margin-top:16px;white-space:pre-line" class="pmuted">${esc(i.notes)}</div>`:''}</div>`;
 }
 function makePdf(i){
@@ -885,14 +884,14 @@ function makePdf(i){
   d.setTextColor(25); d.setFont('helvetica','bold'); d.setFontSize(18); d.text(s.businessName||'Your name', M, y);
   d.setFontSize(20); d.text('INVOICE', R, y, {align:'right'});
   d.setFont('helvetica','normal'); d.setFontSize(9); d.setTextColor(95);
-  let ly=y+6; [s.address, [s.phone,s.email].filter(Boolean).join('   '), s.gstin?'GSTIN '+s.gstin:'', s.pan?'PAN '+s.pan:''].filter(Boolean).forEach(t=>String(t).split('\n').forEach(p=>d.splitTextToSize(p,100).forEach(l=>{d.text(l,M,ly); ly+=4.2;})));
+  let ly=y+6; [s.address, [s.phone,s.email].filter(Boolean).join('   '), s.gstin?'SST No. '+s.gstin:'', s.pan?'Reg. No. '+s.pan:'', s.tin?'TIN '+s.tin:''].filter(Boolean).forEach(t=>String(t).split('\n').forEach(p=>d.splitTextToSize(p,100).forEach(l=>{d.text(l,M,ly); ly+=4.2;})));
   let ry=y+6; [['Invoice no.',i.number],['Date',fmtDate(i.date)],['Due',fmtDate(i.due)]].forEach(([k,v])=>{ if(!v) return; d.setTextColor(120); d.text(k, R-48, ry); d.setTextColor(25); d.text(String(v), R, ry, {align:'right'}); ry+=4.8; });
   y=Math.max(ly,ry)+5; d.setDrawColor(220); d.line(M,y,R,y); y+=7;
   d.setFontSize(8); d.setTextColor(120); d.text('BILL TO', M, y); if(i.project) d.text('PROJECT', R, y, {align:'right'});
   y+=5; d.setFontSize(10); d.setTextColor(25); d.setFont('helvetica','bold'); d.text(c.name||'', M, y); d.setFont('helvetica','normal');
   if(i.project){ d.text(d.splitTextToSize(i.project, 70), R, y, {align:'right'}); }
   d.setFontSize(9); d.setTextColor(95);
-  let by=y+4.6; [c.company, c.address, c.email, c.phone, c.gstin?'GSTIN '+c.gstin:''].filter(Boolean).forEach(t=>String(t).split('\n').forEach(p=>d.splitTextToSize(p,95).forEach(l=>{d.text(l,M,by); by+=4.2;})));
+  let by=y+4.6; [c.company, c.address, c.email, c.phone, c.gstin?'SST No. '+c.gstin:''].filter(Boolean).forEach(t=>String(t).split('\n').forEach(p=>d.splitTextToSize(p,95).forEach(l=>{d.text(l,M,by); by+=4.2;})));
   if(i.shootDate){ d.text('Shoot '+fmtDate(i.shootDate), R, y+4.6+(d.splitTextToSize(i.project||'',70).length-1)*4.2, {align:'right'}); }
   y=Math.max(by, y+10)+6;
   const X={desc:M+2, qty:122, unit:126, rate:164, amt:R-2};
@@ -909,7 +908,7 @@ function makePdf(i){
   });
   const rows=[['Subtotal',pdfMoney(T.sub)]];
   if(T.disc) rows.push(['Discount','- '+pdfMoney(T.disc)]);
-  if(T.tax){ if(i.taxSplit!=='igst'){ rows.push([`CGST ${num(i.taxRate)/2}%`,pdfMoney(T.tax/2)],[`SGST ${num(i.taxRate)/2}%`,pdfMoney(T.tax/2)]); } else rows.push([`IGST ${num(i.taxRate)}%`,pdfMoney(T.tax)]); }
+  if(T.tax) rows.push([`SST ${num(i.taxRate)}%`,pdfMoney(T.tax)]);
   if(y+40>275){ d.addPage(); y=22; }
   y+=2; d.setFontSize(9.5);
   rows.forEach(([k,v])=>{ d.setTextColor(95); d.text(k, R-62, y); d.setTextColor(25); d.text(v, R, y, {align:'right'}); y+=5.5; });
@@ -919,7 +918,7 @@ function makePdf(i){
   if(i.status==='Paid'){ d.setTextColor(43,115,80); d.text('Paid in full', R, y, {align:'right'}); y+=6; }
   else if(T.paid){ d.setFont('helvetica','normal'); d.setTextColor(95); d.text('Received', R-62, y); d.setTextColor(25); d.text('- '+pdfMoney(T.paid), R, y, {align:'right'}); y+=6; d.setFont('helvetica','bold'); d.text('Balance due', R-62, y); d.text(pdfMoney(T.balance), R, y, {align:'right'}); y+=6; }
   d.setFont('helvetica','normal'); y+=6;
-  const pay=[s.accountName&&'Account name: '+s.accountName, s.bankName&&'Bank: '+s.bankName, s.accountNumber&&'Account no.: '+s.accountNumber, s.ifsc&&'IFSC: '+s.ifsc, s.upi&&'UPI: '+s.upi].filter(Boolean);
+  const pay=[s.accountName&&'Account name: '+s.accountName, s.bankName&&'Bank: '+s.bankName, s.accountNumber&&'Account no.: '+s.accountNumber, s.ifsc&&'SWIFT: '+s.ifsc, s.upi&&'DuitNow: '+s.upi].filter(Boolean);
   if(pay.length){ if(y+8+pay.length*4.6>285){ d.addPage(); y=22; } d.setFontSize(8); d.setTextColor(120); d.text('PAYMENT DETAILS', M, y); y+=5; d.setFontSize(9.5); d.setTextColor(25); pay.forEach(p=>{ d.text(p, M, y); y+=4.6; }); y+=4; }
   if(i.notes){ d.setFontSize(8.5); d.setTextColor(110); String(i.notes).split('\n').forEach(p=>d.splitTextToSize(p, R-M).forEach(l=>{ if(y>285){ d.addPage(); y=22; } d.text(l,M,y); y+=4; })); }
   return d;
@@ -958,11 +957,11 @@ function openLib(item){
       <label class="f">Tailor or unit<input class="inp" name="c_tailor" value="${esc(c.tailor)}"></label>
       <label class="f">Fabric<input class="inp" name="c_fabric" value="${esc(c.fabric)}"></label>
       <label class="f">Fabric used<input class="inp" name="c_consumption" value="${esc(c.consumption)}" placeholder="e.g. 3.5 m"></label>
-      <label class="f">Fabric cost (₹)<input class="inp" name="c_fabricCost" inputmode="decimal" value="${esc(c.fabricCost)}" data-in="cmt"></label>
-      <label class="f">Cutting (₹)<input class="inp" name="c_cutting" inputmode="decimal" value="${esc(c.cutting)}" data-in="cmt"></label>
-      <label class="f">Making (₹)<input class="inp" name="c_making" inputmode="decimal" value="${esc(c.making)}" data-in="cmt"></label>
-      <label class="f">Trims and finishing (₹)<input class="inp" name="c_trims" inputmode="decimal" value="${esc(c.trims)}" data-in="cmt"></label>
-      <label class="f">Other (₹)<input class="inp" name="c_other" inputmode="decimal" value="${esc(c.other)}" data-in="cmt"></label>
+      <label class="f">Fabric cost (RM)<input class="inp" name="c_fabricCost" inputmode="decimal" value="${esc(c.fabricCost)}" data-in="cmt"></label>
+      <label class="f">Cutting (RM)<input class="inp" name="c_cutting" inputmode="decimal" value="${esc(c.cutting)}" data-in="cmt"></label>
+      <label class="f">Making (RM)<input class="inp" name="c_making" inputmode="decimal" value="${esc(c.making)}" data-in="cmt"></label>
+      <label class="f">Trims and finishing (RM)<input class="inp" name="c_trims" inputmode="decimal" value="${esc(c.trims)}" data-in="cmt"></label>
+      <label class="f">Other (RM)<input class="inp" name="c_other" inputmode="decimal" value="${esc(c.other)}" data-in="cmt"></label>
       <label class="f">Sizes and measurements<input class="inp" name="c_sizes" value="${esc(c.sizes)}"></label>
       <div class="full totals" style="max-width:none"><div class="grand"><span>Cost to make</span><span id="cmtSum">${money(cmtTotal(c))}</span></div></div>
     </div></fieldset></div>
@@ -986,7 +985,7 @@ function openClient(cl){
   D={kind:'client', obj:c, isNew};
   const fld=(n,l,full)=>`<label class="f ${full?'full':''}">${l}<input class="inp" name="${n}" value="${esc(c[n])}"></label>`;
   const jobs = S.jobs.filter(j=>j.clientId===c.id);
-  openDrawer(isNew?'New client':c.name, `<form data-form="client" class="fgrid">${fld('name','Name',true)}${fld('company','Company or brand')}${fld('gstin','GSTIN')}${fld('email','Email')}${fld('phone','Phone')}<label class="f full">Billing address<textarea class="inp" name="address">${esc(c.address)}</textarea></label><label class="f full">Notes<textarea class="inp" name="notes">${esc(c.notes)}</textarea></label>${jobs.length?`<div class="full"><fieldset><legend>Jobs</legend>${jobs.map(j=>jobRow(j)).join('')}</fieldset></div>`:''}</form>`,
+  openDrawer(isNew?'New client':c.name, `<form data-form="client" class="fgrid">${fld('name','Name',true)}${fld('company','Company or brand')}${fld('gstin','SST registration no.')}${fld('email','Email')}${fld('phone','Phone')}<label class="f full">Billing address<textarea class="inp" name="address">${esc(c.address)}</textarea></label><label class="f full">Notes<textarea class="inp" name="notes">${esc(c.notes)}</textarea></label>${jobs.length?`<div class="full"><fieldset><legend>Jobs</legend>${jobs.map(j=>jobRow(j)).join('')}</fieldset></div>`:''}</form>`,
     `${isNew?'':'<button class="btn danger ghost" data-act="delclient">Delete</button>'}<span class="spacer"></span><button class="btn primary" data-act="saveclient">Save client</button>`);
 }
 
