@@ -4,7 +4,7 @@ A simple dashboard for a working creative: track shoots across every role, keep 
 
 **Open it here:** https://YOUR-GITHUB-USERNAME.github.io/studio-ledger/
 
-No sign-up, no install. It works on a laptop or a phone.
+No sign-up, no install. Open it in Chrome, Edge or Safari on your laptop.
 
 ---
 
@@ -24,16 +24,20 @@ Jobs sort themselves into **Upcoming**, **On now**, and **Past** by their dates.
 
 **Library.** Your archive of designs, CMT forms, mood boards, reference images, and tech packs. CMT forms have fields for fabric, consumption, cutting, making, and trims, plus a total cost to make. Use **Reuse as new** to copy an old design as the starting point for a new one.
 
+**CMT forms (custom garments).** Open a job and click **Start CMT forms**, or open a client and do the same, or add a *CMT form* item in the Library. Pick the client and job, fill in the garment, maker, fabric and costs, and choose which of the four forms to print:
+1. Client brief and measurements
+2. Design and materials (with the figure page for sketching)
+3. Costing and quotation
+4. Fitting and alterations (print one copy per fitting)
+
+Details the app already knows (client name and contact, project reference, garment, maker, fabric, costs, event date, your studio contact and payment method) print in blue. Everything else is left blank to fill in by hand. After filling the forms in and attaching swatches or images, scan or photograph each page, then go back to the same item and use **Scanned forms → Add scans**, choosing which form it is. Scans are kept with that client and job, and the Library search finds them by client name.
+
 **Invoices.** Open a job and tap **Create invoice**. The lines carry over. Add a discount, SST if you're registered, and any advance received, then **Download PDF**. Change the status to Sent, Partly paid, or Paid as money comes in.
 
 **Overview.** What's on now, what's next, what you're owed, what's overdue, wrapped jobs you haven't invoiced yet, and which roles earn you the most this year.
 
-### On your phone
-Open the link, then:
-- **iPhone (Safari):** Share → Add to Home Screen
-- **Android (Chrome):** ⋮ menu → Add to Home screen
-
-It then opens like an app.
+### Use it on one device
+For now, keep everything on your laptop. Your phone and laptop don't share data, so anything added on your phone won't show up on your laptop. Phone access will come later with cloud sync.
 
 ---
 
