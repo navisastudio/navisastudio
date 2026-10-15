@@ -32,7 +32,15 @@ Jobs sort themselves into **Upcoming**, **On now**, and **Past** by their dates.
 
 Details the app already knows (client name and contact, project reference, garment, maker, fabric, costs, event date, your studio contact and payment method) print in blue. Everything else is left blank to fill in by hand. After filling the forms in and attaching swatches or images, scan or photograph each page, then go back to the same item and use **Scanned forms → Add scans**, choosing which form it is. Scans are kept with that client and job, and the Library search finds them by client name.
 
-**Invoices.** Open a job and tap **Create invoice**. The lines carry over. Add a discount, SST if you're registered, and any advance received, then **Download PDF**. Change the status to Sent, Partly paid, or Paid as money comes in.
+**Invoices.** Invoices use the Navisa Studio template: the cowhide background, BILLED TO and studio details at the top, a heading such as *SET DESIGN: PROP RENTAL*, then description, price, quantity and total columns, with subtotal, delivery and total, and payment information at the bottom.
+- Open a job and click **Create invoice** (lines carry over), click **New invoice** to start blank, or open an old invoice and click **Use as template** to copy it with the next number.
+- Add a line per item: description, quantity and price. The role column is optional and only for your own tracking; it never prints.
+- Set the heading, the date and optionally a due date (leave due blank to print only the date). The quantity column can read QTY, QTY (M), HOURS, DAYS or PCS.
+- Delivery, discount and SST lines appear only when used (delivery always shows, as on the template).
+- **Preview** to check it, then **Download PDF** to send it, or **Print**.
+- Invoice numbers follow your prefix (for example SD PR 33). Set the prefix and the next number once in Settings.
+- For the billed-to block, add the client's company registration number and billing address in Clients.
+
 
 **Overview.** What's on now, what's next, what you're owed, what's overdue, wrapped jobs you haven't invoiced yet, and which roles earn you the most this year.
 
@@ -54,7 +62,7 @@ Everything is saved **inside the browser on the device you're using**. Nothing i
 
 ## For whoever maintains this
 
-It's a static site: `index.html` plus `vendor/jspdf.umd.min.js` (PDF generation, MIT license). There's no build step and no server.
+It's a static site: `index.html`, `vendor/jspdf.umd.min.js` (PDF generation, MIT license) and `assets/fonts/` (Poppins, used on invoices, SIL Open Font License). There's no build step and no server.
 
 **To host it on GitHub Pages:**
 1. Create a public repo named `studio-ledger` and upload these files to its root.

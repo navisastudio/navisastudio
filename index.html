@@ -198,6 +198,48 @@ legend{font-family:var(--serif);font-size:20px;margin-bottom:10px;padding:0}
   main{padding-bottom:110px}
 }
 
+/* ===== Invoice template (Navisa) ===== */
+@font-face{font-family:"PoppinsInv";src:url("assets/fonts/Poppins-Regular.ttf") format("truetype");font-weight:400;font-display:swap}
+@font-face{font-family:"PoppinsInv";src:url("assets/fonts/Poppins-Medium.ttf") format("truetype");font-weight:500;font-display:swap}
+@font-face{font-family:"PoppinsInv";src:url("assets/fonts/Poppins-Bold.ttf") format("truetype");font-weight:700;font-display:swap}
+.inv-wrap{overflow:hidden;border:1px solid var(--line)}
+.inv-sheet{position:relative;width:210mm;min-height:297mm;background:#fff;color:#111;font-family:"PoppinsInv",Poppins,"Helvetica Neue",Arial,sans-serif;font-size:12.5pt;line-height:1.36;letter-spacing:0;padding:14.5mm 12.3mm 12mm 12.5mm;font-weight:500;display:flex;flex-direction:column;transform-origin:0 0;box-sizing:border-box}
+.inv-sheet .bg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:0}
+.inv-sheet>*:not(.bg){position:relative;z-index:1}
+.inv-top{display:flex;justify-content:space-between;gap:8mm}
+.inv-word{font-weight:700;font-size:53pt;line-height:1.05;margin:0 0 6mm -0.6mm}
+.inv-billed{text-transform:uppercase;max-width:80mm;font-weight:400}
+.inv-billed .inv-b:first-child,.inv-pay>.inv-b{font-size:14.5pt;line-height:1.3;margin-bottom:.8mm}
+.inv-billed .em,.inv-from .em{text-transform:none}
+.inv-from{text-align:right;text-transform:uppercase;padding-top:5mm;max-width:92mm;font-weight:400}
+.inv-b{font-weight:700}
+.inv-title{display:flex;justify-content:space-between;align-items:flex-end;gap:8mm;margin-top:8mm}
+.inv-title .h{font-weight:700;font-size:24pt;line-height:1.2;text-transform:uppercase}
+.inv-title .dt{font-weight:400;font-size:15.5pt;text-align:right;line-height:1.3;white-space:nowrap;padding-right:2mm}
+.inv-t{width:100%;border-collapse:collapse;margin-top:4mm;table-layout:fixed}
+.inv-t th{font-weight:700;font-size:12.5pt;padding:3.4mm 0;border-top:.55mm solid #111;border-bottom:.4mm solid #111;text-align:center}
+.inv-t td{padding:.75mm 0;text-align:center;vertical-align:middle;font-size:12pt;line-height:1.35}
+.inv-t th:first-child,.inv-t td:first-child{text-align:left;padding-left:3mm}
+.inv-t td:first-child{padding-right:0}
+.inv-t tbody tr:first-child td{padding-top:5mm}
+.inv-t tbody tr:last-child td{padding-bottom:4mm;border-bottom:.3mm solid #111}
+.inv-foot{display:flex;justify-content:space-between;gap:6mm;flex:1}
+.inv-tot{width:76.1mm;margin-top:2mm;align-self:flex-start;flex:none}
+.inv-tot .r{display:grid;grid-template-columns:36.8mm 1fr;text-align:center;padding:.4mm 0}
+.inv-tot .r span:first-child{font-weight:700}
+.inv-tot .r.grand{border-top:.3mm solid #111;margin-top:1.5mm;padding-top:2.5mm;font-weight:700}
+.inv-pay{align-self:flex-end;padding-top:3mm;font-weight:400}
+.inv-pay .g{line-height:1.45}
+.inv-pay .g{display:grid;grid-template-columns:40.3mm 7.5mm 1fr;margin-top:2mm}
+.inv-notes{font-size:9pt;margin-top:4mm;white-space:pre-line;color:#333}
+@media print{
+  @page invoice{size:A4;margin:0}
+  #printArea .inv-sheet{page:invoice;transform:none !important;min-height:296mm;break-after:page;overflow:hidden}
+  #printArea{margin:0;padding:0}
+  #printArea .inv-sheet:last-child{break-after:auto}
+  #printArea .inv-sheet .bg{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+}
+
 /* ===== Printable CMT forms ===== */
 #printArea{display:none}
 .scanlist{display:flex;flex-direction:column;gap:12px;margin-top:10px}
@@ -219,9 +261,10 @@ legend{font-family:var(--serif);font-size:20px;margin-bottom:10px;padding:0}
 .pf-h{font-size:11pt;font-weight:700;margin:14px 0 4px}
 .pf-f{display:flex;gap:8px;align-items:flex-end;margin:5px 0;font-size:8.5pt}
 .pf-f b{white-space:nowrap}
-.pf-f .v,.pf-b .v{flex:1;border-bottom:1px solid #888;min-height:15px;font-size:10pt;color:#1d3c8f;padding:0 2px}
+.pf-f .v,.pf-b .v{flex:1;min-height:15px;font-size:10pt;color:#1d3c8f;padding:0 2px}
 .pf-b{margin:6px 0 4px;font-size:8.5pt}
 .pf-b .v{min-height:30px;padding-top:3px}
+.pf-b.ruled .v{border-bottom:1px solid #888;min-height:34px}
 .pf-b.xl .v{min-height:60px}
 .pf-t{width:100%;border-collapse:collapse;font-size:8.5pt;margin:6px 0 8px}
 .pf-t th{background:#e4e4e4;text-align:left;font-weight:700;border:1px solid #9a9a9a;padding:3px 5px}
@@ -409,6 +452,7 @@ const num = v => { const n = parseFloat(v); return isFinite(n) ? n : 0; };
 const LOCALE='en-MY', CUR='MYR';
 const cur = new Intl.NumberFormat(LOCALE,{style:'currency',currency:CUR,minimumFractionDigits:0,maximumFractionDigits:0});
 const money = n => cur.format(Math.round(num(n)));
+const money2 = n => 'RM ' + num(n).toLocaleString(LOCALE,{minimumFractionDigits:2,maximumFractionDigits:2});
 const pdfMoney = n => 'RM ' + num(n).toLocaleString(LOCALE,{minimumFractionDigits:2,maximumFractionDigits:2});
 const pad = n => String(n).padStart(2,'0');
 const isoDate = d => `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
@@ -532,9 +576,10 @@ function invTotals(inv){
   const disc = Math.min(num(inv.discount), sub);
   const taxable = Math.max(0, sub-disc);
   const tax = taxable * num(inv.taxRate)/100;
-  const total = taxable + tax;
+  const delivery = num(inv.delivery);
+  const total = taxable + tax + delivery;
   const paid = inv.status==='Paid' ? total : Math.min(num(inv.paidAmount), total);
-  return {sub, disc, taxable, tax, total, paid, balance: Math.max(0,total-paid)};
+  return {sub, disc, taxable, tax, delivery, total, paid, balance: Math.max(0,total-paid)};
 }
 const clientById = id => S.clients.find(c=>c.id===id) || null;
 const clientName = id => (clientById(id)||{}).name || '';
@@ -572,10 +617,10 @@ function rateStats(k){
 function libUseCount(id){ return S.jobs.filter(j=>(j.libraryIds||[]).includes(id)).length; }
 function nextInvoiceNumber(){
   const prefix = (S.settings.invoicePrefix || 'INV').trim();
-  const y = new Date().getFullYear();
-  const re = new RegExp('^'+prefix.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+'-'+y+'-(\\d+)$');
-  let max = 0; for(const i of S.invoices){ const m = re.exec(i.number||''); if(m) max=Math.max(max, parseInt(m[1],10)); }
-  return `${prefix}-${y}-${String(max+1).padStart(3,'0')}`;
+  const re = new RegExp('^'+prefix.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+'[\\s-]*(?:\\d{4}-)?(\\d+)$','i');
+  let max = 0; for(const i of S.invoices){ const m = re.exec((i.number||'').trim()); if(m) max=Math.max(max, parseInt(m[1],10)); }
+  const start = parseInt(S.settings.invoiceNext,10) || 1;
+  return `${prefix} ${Math.max(max+1, start)}`;
 }
 
 /* ---------- nav ---------- */
@@ -734,8 +779,9 @@ function vSettings(){
       ${f('bankName','Bank')}${f('accountName','Account holder')}${f('accountNumber','Account number')}${f('ifsc','SWIFT code','For overseas clients')}${f('upi','DuitNow ID','Phone, IC or business no.')}
     </div></fieldset>
     <fieldset><legend>Invoice defaults</legend><div class="fgrid">
-      ${f('invoicePrefix','Number prefix','INV')}
-      <label class="f">Payment due after (days)<input class="inp" name="dueDays" inputmode="numeric" value="${esc(s.dueDays ?? 15)}"></label>
+      ${f('invoicePrefix','Invoice number prefix','e.g. SD PR')}
+      <label class="f">Next invoice number<input class="inp" name="invoiceNext" inputmode="numeric" value="${esc(s.invoiceNext ?? '')}" placeholder="e.g. 33"><span class="hint">Used once; after that it counts up from your last invoice</span></label>
+      <label class="f">Payment due after (days)<input class="inp" name="dueDays" inputmode="numeric" value="${esc(s.dueDays ?? 4)}"></label>
       <label class="f">SST rate (%)<input class="inp" name="taxRate" inputmode="decimal" value="${esc(s.taxRate ?? '')}" placeholder="0 if not registered"><span class="hint">8% for most services, 6% for rental and leasing</span></label>
       <label class="f full">Default notes and terms<textarea class="inp" name="terms">${esc(s.terms)}</textarea></label>
     </div></fieldset>
@@ -756,30 +802,40 @@ function clientSelect(sel){
   return `<select class="inp" name="clientId" data-in="clientsel"><option value="">Choose a client</option>${[...S.clients].sort((a,b)=>(a.name||'').localeCompare(b.name||'')).map(c=>`<option value="${c.id}" ${c.id===sel?'selected':''}>${esc(c.name)}</option>`).join('')}<option value="__new">+ New client…</option></select>
   <input class="inp" name="newClient" placeholder="New client's name" style="display:none;margin-top:6px">`;
 }
-function itemsEditor(items){
-  return `<div class="items-wrap"><table class="items"><thead><tr><th style="width:24%">Role</th><th>What</th><th style="width:9%">Qty</th><th style="width:17%">Unit</th><th style="width:14%">Rate (RM)</th><th style="width:12%;text-align:right">Amount</th><th></th></tr></thead>
-  <tbody id="itemsBody">${(items.length?items:[{}]).map(itemRow).join('')}</tbody></table></div>
+function itemsEditor(items, mode){
+  const inv = mode==='inv';
+  const head = inv
+    ? `<th>Description</th><th style="width:17%">Role <span class="hint">optional</span></th><th style="width:9%">Qty</th><th style="width:13%">Price (RM)</th><th style="width:13%;text-align:right">Total</th><th></th>`
+    : `<th style="width:24%">Role</th><th>What</th><th style="width:9%">Qty</th><th style="width:17%">Unit</th><th style="width:14%">Rate (RM)</th><th style="width:12%;text-align:right">Amount</th><th></th>`;
+  return `<div class="items-wrap"><table class="items"><thead><tr>${head}</tr></thead>
+  <tbody id="itemsBody" data-mode="${inv?'inv':'job'}">${(items.length?items:[{}]).map(it=>itemRow(it, mode)).join('')}</tbody></table></div>
   <div style="display:flex;justify-content:space-between;align-items:center;margin-top:6px"><button class="btn sm" type="button" data-act="additem">Add line</button><div class="amt" id="itemsSum"></div></div>`;
 }
-function itemRow(it={}){
+function itemRow(it={}, mode){
+  const roleSel = `<select class="inp" name="role" data-in="role"><option value="">${mode==='inv'?'None':'Choose'}</option>${ROLES.map(r=>`<option value="${r.k}" ${r.k===it.role?'selected':''}>${r.n}</option>`).join('')}</select>`;
+  const amt = `<td class="amount">${money(num(it.qty ?? 1)*num(it.rate))}</td><td><button type="button" class="x" data-act="delrow" aria-label="Remove line">×</button></td>`;
+  if(mode==='inv') return `<tr class="irow" data-unit="${esc(it.unit||'')}">
+    <td><input class="inp" name="desc" value="${esc(it.desc)}" placeholder="e.g. Champagne satin XL tablecloth"></td>
+    <td>${roleSel}</td>
+    <td><input class="inp" name="qty" inputmode="decimal" value="${esc(it.qty ?? 1)}" data-in="calc"></td>
+    <td><input class="inp" name="rate" inputmode="decimal" value="${esc(it.rate)}" data-in="calc"></td>${amt}</tr>`;
   return `<tr class="irow">
-    <td><select class="inp" name="role" data-in="role"><option value="">Choose</option>${ROLES.map(r=>`<option value="${r.k}" ${r.k===it.role?'selected':''}>${r.n}</option>`).join('')}</select></td>
+    <td>${roleSel}</td>
     <td><input class="inp" name="desc" value="${esc(it.desc)}" placeholder="e.g. 6 looks, full day"></td>
     <td><input class="inp" name="qty" inputmode="decimal" value="${esc(it.qty ?? 1)}" data-in="calc"></td>
     <td><select class="inp" name="unit">${UNITS.map(u=>`<option ${u===(it.unit||'per day')?'selected':''}>${u}</option>`).join('')}</select></td>
-    <td><input class="inp" name="rate" inputmode="decimal" value="${esc(it.rate)}" data-in="calc"></td>
-    <td class="amount">${money(num(it.qty ?? 1)*num(it.rate))}</td>
-    <td><button type="button" class="x" data-act="delrow" aria-label="Remove line">×</button></td></tr>`;
+    <td><input class="inp" name="rate" inputmode="decimal" value="${esc(it.rate)}" data-in="calc"></td>${amt}</tr>`;
 }
 function readItems(){
-  return [...document.querySelectorAll('#itemsBody .irow')].map(tr=>({
-    role: tr.querySelector('[name=role]').value, desc: tr.querySelector('[name=desc]').value.trim(),
-    qty: num(tr.querySelector('[name=qty]').value), unit: tr.querySelector('[name=unit]').value, rate: num(tr.querySelector('[name=rate]').value)
-  })).filter(i=>i.role||i.desc||i.rate);
+  return [...document.querySelectorAll('#itemsBody .irow')].map(tr=>{
+    const u = tr.querySelector('[name=unit]');
+    return { role: tr.querySelector('[name=role]').value, desc: tr.querySelector('[name=desc]').value.trim(),
+      qty: num(tr.querySelector('[name=qty]').value), unit: u ? u.value : (tr.dataset.unit||''), rate: num(tr.querySelector('[name=rate]').value) };
+  }).filter(i=>i.role||i.desc||i.rate);
 }
 function recalcItems(){
-  let sum=0; document.querySelectorAll('#itemsBody .irow').forEach(tr=>{ const a=num(tr.querySelector('[name=qty]').value)*num(tr.querySelector('[name=rate]').value); sum+=a; tr.querySelector('.amount').textContent=money(a); });
-  const s=$('#itemsSum'); if(s) s.textContent = 'Total '+money(sum);
+  const fm = (D && D.kind==='inv') ? money2 : money; let sum=0; document.querySelectorAll('#itemsBody .irow').forEach(tr=>{ const a=num(tr.querySelector('[name=qty]').value)*num(tr.querySelector('[name=rate]').value); sum+=a; tr.querySelector('.amount').textContent=fm(a); });
+  const s=$('#itemsSum'); if(s) s.textContent = 'Subtotal '+fm(sum);
   if(D && D.kind==='inv') recalcInvTotals();
 }
 function expRow(e={}){ return `<tr class="erow"><td><input class="inp" name="edesc" value="${esc(e.desc)}" placeholder="Fabric, travel, props hire…"></td><td style="width:28%"><input class="inp" name="eamt" inputmode="decimal" value="${esc(e.amount)}" placeholder="RM"></td><td style="width:40px"><button type="button" class="x" data-act="delrow" aria-label="Remove">×</button></td></tr>`; }
@@ -856,46 +912,56 @@ async function saveJob(){
 }
 
 /* invoice */
+const QTY_LABELS = ['QTY','QTY (M)','HOURS','DAYS','PCS'];
 function openInvoice(inv, fromJob){
   const s = S.settings; const isNew = !inv;
   let i;
-  if(inv) i = clone(inv);
+  if(inv){ i = clone(inv); if(i.heading==null) i.heading = i.project||''; }
   else {
     const d = today();
-    i = {id:newId(), number:nextInvoiceNumber(), date:d, due:addDays(d, num(s.dueDays ?? 15) || 15), clientId:'', items:[], discount:0, taxRate:num(s.taxRate), paidAmount:0, status:'Draft', notes:s.terms||'', project:''};
-    if(fromJob){ i.jobId=fromJob.id; i.clientId=fromJob.clientId; i.project=fromJob.title; i.shootDate=fromJob.start; i.items=clone(fromJob.items||[]); }
+    i = {id:newId(), number:nextInvoiceNumber(), date:d, due:addDays(d, num(s.dueDays ?? 4) || 4), clientId:'', items:[], discount:0, delivery:0, taxRate:num(s.taxRate), paidAmount:0, status:'Draft', notes:s.terms||'', project:'', heading:'', qtyLabel:'QTY'};
+    if(fromJob){
+      const r = (fromJob.items||[]).find(x=>x.role);
+      i.jobId=fromJob.id; i.clientId=fromJob.clientId; i.project=fromJob.title; i.shootDate=fromJob.start;
+      i.heading = r ? `${roleOf(r.role).n}: ${fromJob.title||''}` : (fromJob.title||'');
+      i.items=clone(fromJob.items||[]).map(x=>Object.assign(x,{desc: x.desc || roleOf(x.role).n}));
+    }
   }
   D = {kind:'inv', obj:i, isNew};
   const body = `<form data-form="inv" class="fgrid">
     <label class="f">Invoice number<input class="inp" name="number" value="${esc(i.number)}"></label>
     <label class="f">Status<select class="inp" name="status" data-in="calc">${INV_STATUS.map(x=>`<option ${x===i.status?'selected':''}>${x}</option>`).join('')}</select></label>
-    <label class="f">Bill to${clientSelect(i.clientId)}</label>
-    <label class="f">Project<input class="inp" name="project" value="${esc(i.project)}"></label>
+    <label class="f">Billed to${clientSelect(i.clientId)}</label>
+    <label class="f">Heading on invoice<input class="inp" name="heading" value="${esc(i.heading)}" placeholder="e.g. Set design: Prop rental"></label>
     <label class="f">Invoice date<input class="inp" type="date" name="date" value="${esc(i.date)}"></label>
-    <label class="f">Due<input class="inp" type="date" name="due" value="${esc(i.due)}"></label>
-    <div class="full"><fieldset style="margin-top:6px"><legend>Line items</legend>${itemsEditor(i.items||[])}</fieldset></div>
-    <label class="f">Discount (RM)<input class="inp" name="discount" inputmode="decimal" value="${esc(i.discount||'')}" data-in="calc"></label>
+    <label class="f">Due date <span class="hint">leave blank to show only the date</span><input class="inp" type="date" name="due" value="${esc(i.due)}"></label>
+    <div class="full"><fieldset style="margin-top:6px"><legend>Line items</legend>
+      <label class="f" style="flex-direction:row;align-items:center;gap:8px;margin-bottom:8px">Quantity column shows as<select class="inp" name="qtyLabel" style="width:auto">${QTY_LABELS.map(q=>`<option ${q===(i.qtyLabel||'QTY')?'selected':''}>${q}</option>`).join('')}</select></label>
+      ${itemsEditor(i.items||[], 'inv')}</fieldset></div>
+    <label class="f">Delivery (RM)<input class="inp" name="delivery" inputmode="decimal" value="${esc(i.delivery||'')}" placeholder="0" data-in="calc"></label>
+    <label class="f">Discount (RM)<input class="inp" name="discount" inputmode="decimal" value="${esc(i.discount||'')}" placeholder="0" data-in="calc"></label>
     <label class="f">SST (%)<input class="inp" name="taxRate" inputmode="decimal" value="${esc(i.taxRate||'')}" placeholder="0" data-in="calc"></label>
     <label class="f">Received so far, incl. advance (RM)<input class="inp" name="paidAmount" inputmode="decimal" value="${esc(i.paidAmount||'')}" data-in="calc"></label>
     <label class="f">Date paid<input class="inp" type="date" name="paidDate" value="${esc(i.paidDate)}"></label>
     <div class="full"><div class="totals" id="invTotals"></div></div>
-    <label class="f full">Notes and terms<textarea class="inp" name="notes">${esc(i.notes)}</textarea></label>
+    <label class="f full">Notes <span class="hint">optional, printed small under payment information</span><textarea class="inp" name="notes">${esc(i.notes)}</textarea></label>
   </form>`;
-  const foot = `${isNew?'':'<button class="btn danger ghost" data-act="delinv">Delete</button>'}<span class="spacer"></span><button class="btn" data-act="previnv">Preview</button><button class="btn" data-act="pdfinv">Download PDF</button><button class="btn primary" data-act="saveinv">Save invoice</button>`;
+  const foot = `${isNew?'':'<button class="btn danger ghost" data-act="delinv">Delete</button><button class="btn ghost" data-act="dupinv">Use as template</button>'}<span class="spacer"></span><button class="btn" data-act="previnv">Preview</button><button class="btn" data-act="pdfinv">Download PDF</button><button class="btn primary" data-act="saveinv">Save invoice</button>`;
   openDrawer(isNew?'New invoice':i.number, body, foot);
   recalcItems();
 }
 function readInvoiceForm(){
   const f = document.querySelector('[data-form=inv]'); if(!f) return D.obj;
   const g = n => (f.querySelector(`[name=${n}]`)||{}).value ?? '';
-  return Object.assign(D.obj, {number:g('number').trim(), status:g('status'), project:g('project').trim(), date:g('date'), due:g('due'),
-    items:readItems(), discount:num(g('discount')), taxRate:num(g('taxRate')), paidAmount:num(g('paidAmount')), paidDate:g('paidDate'), notes:g('notes'), updated:new Date().toISOString()});
+  const heading = g('heading').trim();
+  return Object.assign(D.obj, {number:g('number').trim(), status:g('status'), heading, project: heading || D.obj.project || '', date:g('date'), due:g('due'), qtyLabel:g('qtyLabel')||'QTY',
+    items:readItems(), delivery:num(g('delivery')), discount:num(g('discount')), taxRate:num(g('taxRate')), paidAmount:num(g('paidAmount')), paidDate:g('paidDate'), notes:g('notes'), updated:new Date().toISOString()});
 }
 function recalcInvTotals(){
   const f = document.querySelector('[data-form=inv]'); if(!f) return;
   const g = n => f.querySelector(`[name=${n}]`).value;
-  const T = invTotals({items:readItems(), discount:g('discount'), taxRate:g('taxRate'), paidAmount:g('paidAmount'), status:g('status')});
-  $('#invTotals').innerHTML = `<div><span>Subtotal</span><span>${money(T.sub)}</span></div>${T.disc?`<div><span>Discount</span><span>−${money(T.disc)}</span></div>`:''}${T.tax?`<div><span>SST ${num(g('taxRate'))}%</span><span>${money(T.tax)}</span></div>`:''}<div class="grand"><span>Total</span><span>${money(T.total)}</span></div>${T.paid?`<div><span>Received</span><span>−${money(T.paid)}</span></div><div class="grand"><span>Balance due</span><span>${money(T.balance)}</span></div>`:''}`;
+  const T = invTotals({items:readItems(), delivery:g('delivery'), discount:g('discount'), taxRate:g('taxRate'), paidAmount:g('paidAmount'), status:g('status')});
+  $('#invTotals').innerHTML = `<div><span>Subtotal</span><span>${money2(T.sub)}</span></div>${T.disc?`<div><span>Discount</span><span>−${money2(T.disc)}</span></div>`:''}${T.tax?`<div><span>SST ${num(g('taxRate'))}%</span><span>${money2(T.tax)}</span></div>`:''}<div><span>Delivery</span><span>${money2(T.delivery)}</span></div><div class="grand"><span>Total</span><span>${money2(T.total)}</span></div>${T.paid?`<div><span>Received</span><span>−${money2(T.paid)}</span></div><div class="grand"><span>Balance due</span><span>${money2(T.balance)}</span></div>`:''}`;
 }
 async function saveInvoice(){
   const i = readInvoiceForm(); const f = document.querySelector('[data-form=inv]');
@@ -905,60 +971,120 @@ async function saveInvoice(){
   if(i.status==='Paid' && !i.paidDate) i.paidDate = today();
   try{ await Store.save('invoices', i); D.isNew=false; toast('Invoice saved'); return i; }catch(e){}
 }
-function invoiceHTML(i){
-  const s=S.settings, c=clientById(i.clientId)||{}, T=invTotals(i);
-  return `<div class="paper"><div class="ptop"><div><h4>${esc(s.businessName||'Your name')}</h4><div class="pmuted" style="white-space:pre-line;margin-top:6px">${esc([s.address,[s.phone,s.email].filter(Boolean).join('   '),s.gstin?'SST No. '+s.gstin:'',s.pan?'Reg. No. '+s.pan:'',s.tin?'TIN '+s.tin:''].filter(Boolean).join('\n'))}</div></div>
-  <div style="text-align:right"><div style="font-weight:700;font-size:20px;letter-spacing:.04em">INVOICE</div><div>${esc(i.number)}</div><div class="pmuted">Date ${fmtDate(i.date)}</div>${i.due?`<div class="pmuted">Due ${fmtDate(i.due)}</div>`:''}</div></div>
-  <div class="ptop" style="margin-top:22px"><div><div class="pmuted" style="font-size:11px">Bill to</div><div style="font-weight:700">${esc(c.name||'')}</div><div class="pmuted" style="white-space:pre-line">${esc([c.company,c.address,c.email,c.phone,c.gstin?'SST No. '+c.gstin:''].filter(Boolean).join('\n'))}</div></div>${i.project?`<div style="text-align:right"><div class="pmuted" style="font-size:11px">Project</div><div>${esc(i.project)}</div>${i.shootDate?`<div class="pmuted">Shoot ${fmtDate(i.shootDate)}</div>`:''}</div>`:''}</div>
-  <table><thead><tr><th>Description</th><th class="r">Qty</th><th>Unit</th><th class="r">Rate</th><th class="r">Amount</th></tr></thead><tbody>${(i.items||[]).map(it=>`<tr><td><b>${esc(roleOf(it.role).n)}</b>${it.desc?`<div class="pmuted">${esc(it.desc)}</div>`:''}</td><td class="r">${esc(it.qty)}</td><td>${esc(it.unit)}</td><td class="r">${money(it.rate)}</td><td class="r">${money(num(it.qty)*num(it.rate))}</td></tr>`).join('')}</tbody></table>
-  <div class="totals" style="margin-top:14px"><div><span>Subtotal</span><span>${money(T.sub)}</span></div>${T.disc?`<div><span>Discount</span><span>−${money(T.disc)}</span></div>`:''}${T.tax?`<div><span>SST ${num(i.taxRate)}%</span><span>${money(T.tax)}</span></div>`:''}<div class="grand"><span>Total</span><span>${money(T.total)}</span></div>${T.paid&&i.status!=='Paid'?`<div><span>Received</span><span>−${money(T.paid)}</span></div><div class="grand"><span>Balance due</span><span>${money(T.balance)}</span></div>`:''}${i.status==='Paid'?'<div class="grand"><span>Paid in full</span><span></span></div>':''}</div>
-  ${(s.bankName||s.accountNumber||s.upi)?`<div style="margin-top:20px"><div class="pmuted" style="font-size:11px">Payment details</div><div style="white-space:pre-line">${esc([s.accountName&&'Account name: '+s.accountName, s.bankName&&'Bank: '+s.bankName, s.accountNumber&&'Account no.: '+s.accountNumber, s.ifsc&&'SWIFT: '+s.ifsc, s.upi&&'DuitNow: '+s.upi].filter(Boolean).join('\n'))}</div></div>`:''}
-  ${i.notes?`<div style="margin-top:16px;white-space:pre-line" class="pmuted">${esc(i.notes)}</div>`:''}</div>`;
+const INVOICE_BG = 'data:image/jpeg;base64,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';
+const fmtDMY = iso => { if(!iso) return ''; const [y,m,d]=iso.split('-'); return `${d}/${m}/${y}`; };
+const fmtAmt = n => { n=num(n); return Number.isInteger(n) ? String(n) : n.toFixed(2); };
+function invParts(i){
+  const s=S.settings||{}, c=clientById(i.clientId)||{}, T=invTotals(i);
+  const lines = t => String(t||'').split('\n').map(x=>x.trim()).filter(Boolean);
+  const from = [{t:s.businessName||'Your studio name', b:1}, ...(s.pan?[{t:`(${s.pan})`}]:[]), ...lines(s.address).map(t=>({t})), ...(s.email?[{t:s.email, em:1}]:[]), ...(s.gstin?[{t:'SST NO: '+s.gstin}]:[]), {t:'INVOICE NO: '+(i.number||''), b:1}];
+  const billed = [...(c.name?[{t:c.name}]:[]), ...(c.company && c.company!==c.name?[{t:c.company}]:[]), ...(c.regNo?[{t:`(${c.regNo})`}]:[]), ...lines(c.address).map(t=>({t})), ...(c.email?[{t:c.email, em:1}]:[])];
+  const dates = i.due ? [`Date: ${fmtDMY(i.date)}`, `Due: ${fmtDMY(i.due)}`] : [fmtDMY(i.date)];
+  const totals = [['Subtotal', money2(T.sub)]];
+  if(T.disc) totals.push(['Discount', '- '+money2(T.disc)]);
+  if(T.tax) totals.push([`SST ${num(i.taxRate)}%`, money2(T.tax)]);
+  totals.push(['Delivery', fmtAmt(T.delivery)]);
+  const after = [];
+  if(i.status==='Paid') after.push(['Paid', 'In full']);
+  else if(T.paid){ after.push(['Received', '- '+money2(T.paid)]); after.push(['Balance due', money2(T.balance)]); }
+  const pay = [['Bank Acc.', [s.bankName, s.accountName].filter(Boolean).join(' - ')], ['Account No.', s.accountNumber], ['DuitNow', s.upi], ['SWIFT', s.ifsc]].filter(r=>r[1]);
+  const heading = (i.heading!=null && i.heading!=='') ? i.heading : (i.project||'');
+  return {s, c, T, from, billed, dates, totals, after, pay, heading, qtyLabel:(i.qtyLabel||'QTY'), items:(i.items||[]).map(it=>({desc: it.desc || roleOf(it.role).n, price: fmtAmt(it.rate), qty: String(+num(it.qty).toFixed(3)), total: fmtAmt(num(it.qty)*num(it.rate))}))};
 }
-function makePdf(i){
+function invoiceHTML(i){
+  const P = invParts(i);
+  const ln = r => `<div class="${r.b?'inv-b':''}${r.em?' em':''}">${esc(r.t)}</div>`;
+  return `<div class="inv-sheet"><img class="bg" src="${INVOICE_BG}" alt="">
+    <div class="inv-top"><div><div class="inv-word">INVOICE</div><div class="inv-billed"><div class="inv-b">BILLED TO:</div>${P.billed.map(ln).join('')}</div></div>
+      <div class="inv-from">${P.from.map(ln).join('')}</div></div>
+    <div class="inv-title"><div class="h">${esc(P.heading)}</div><div class="dt">${P.dates.map(d=>`<div>${esc(d)}</div>`).join('')}</div></div>
+    <table class="inv-t"><colgroup><col style="width:87.5mm"><col style="width:20mm"><col style="width:48mm"><col style="width:20mm"><col></colgroup>
+      <thead><tr><th>DESCRIPTION</th><th>PRICE</th><th>${esc(P.qtyLabel)}</th><th>TOTAL</th><th></th></tr></thead>
+      <tbody>${P.items.map(r=>`<tr><td>${esc(r.desc)}</td><td>${esc(r.price)}</td><td>${esc(r.qty)}</td><td>${esc(r.total)}</td><td></td></tr>`).join('') || '<tr><td colspan="5">&nbsp;</td></tr>'}</tbody></table>
+    <div class="inv-foot">
+    <div class="inv-pay">${P.pay.length?`<div class="inv-b">PAYMENT INFORMATION :</div>${P.pay.map(([k,v])=>`<div class="g"><span>${esc(k)}</span><span>:</span><span>${esc(v)}</span></div>`).join('')}`:''}${i.notes?`<div class="inv-notes">${esc(i.notes)}</div>`:''}</div>
+    <div class="inv-tot">${P.totals.map(([k,v])=>`<div class="r"><span>${esc(k)}</span><span>${esc(v)}</span></div>`).join('')}<div class="r grand"><span>Total</span><span>${esc(money2(P.T.total))}</span></div>${P.after.map(([k,v])=>`<div class="r"><span>${esc(k)}</span><span>${esc(v)}</span></div>`).join('')}</div>
+    </div>
+  </div>`;
+}
+function fitInvoicePreview(){
+  const w=$('#invPrev'); if(!w) return; const sh=w.querySelector('.inv-sheet'); if(!sh) return;
+  const sc = Math.min(1, w.clientWidth / sh.offsetWidth); sh.style.transform = `scale(${sc})`; w.style.height = (sh.offsetHeight*sc)+'px';
+}
+window.addEventListener('resize', fitInvoicePreview);
+async function printInvoice(i){
+  const pa=$('#printArea'); pa.innerHTML = invoiceHTML(i);
+  try{ await document.fonts.ready; }catch(e){}
+  await Promise.all([...pa.querySelectorAll('img')].map(im=>im.complete?0:new Promise(r=>{im.onload=im.onerror=r;})));
+  window.print();
+}
+/* PDF: same layout, drawn with jsPDF using the bundled Poppins fonts */
+const FONT_CACHE = {};
+async function loadInvoiceFonts(d){
+  const files = {normal:'Poppins-Regular.ttf', medium:'Poppins-Medium.ttf', bold:'Poppins-Bold.ttf'};
+  try{
+    for(const [style,file] of Object.entries(files)){
+      if(!FONT_CACHE[file]){
+        const r = await fetch('assets/fonts/'+file); if(!r.ok) throw new Error('font');
+        const buf = new Uint8Array(await r.arrayBuffer()); let bin=''; for(let k=0;k<buf.length;k+=0x8000) bin+=String.fromCharCode.apply(null, buf.subarray(k,k+0x8000));
+        FONT_CACHE[file] = btoa(bin);
+      }
+      d.addFileToVFS(file, FONT_CACHE[file]); d.addFont(file, 'Poppins', style);
+    }
+    return 'Poppins';
+  }catch(e){ return 'helvetica'; }
+}
+async function makePdf(i){
   const { jsPDF } = window.jspdf; const d = new jsPDF({unit:'mm', format:'a4'});
-  const s=S.settings, c=clientById(i.clientId)||{}, T=invTotals(i); const W=210, M=18, R=W-M;
-  let y=24;
-  d.setTextColor(25); d.setFont('helvetica','bold'); d.setFontSize(18); d.text(s.businessName||'Your name', M, y);
-  d.setFontSize(20); d.text('INVOICE', R, y, {align:'right'});
-  d.setFont('helvetica','normal'); d.setFontSize(9); d.setTextColor(95);
-  let ly=y+6; [s.address, [s.phone,s.email].filter(Boolean).join('   '), s.gstin?'SST No. '+s.gstin:'', s.pan?'Reg. No. '+s.pan:'', s.tin?'TIN '+s.tin:''].filter(Boolean).forEach(t=>String(t).split('\n').forEach(p=>d.splitTextToSize(p,100).forEach(l=>{d.text(l,M,ly); ly+=4.2;})));
-  let ry=y+6; [['Invoice no.',i.number],['Date',fmtDate(i.date)],['Due',fmtDate(i.due)]].forEach(([k,v])=>{ if(!v) return; d.setTextColor(120); d.text(k, R-48, ry); d.setTextColor(25); d.text(String(v), R, ry, {align:'right'}); ry+=4.8; });
-  y=Math.max(ly,ry)+5; d.setDrawColor(220); d.line(M,y,R,y); y+=7;
-  d.setFontSize(8); d.setTextColor(120); d.text('BILL TO', M, y); if(i.project) d.text('PROJECT', R, y, {align:'right'});
-  y+=5; d.setFontSize(10); d.setTextColor(25); d.setFont('helvetica','bold'); d.text(c.name||'', M, y); d.setFont('helvetica','normal');
-  if(i.project){ d.text(d.splitTextToSize(i.project, 70), R, y, {align:'right'}); }
-  d.setFontSize(9); d.setTextColor(95);
-  let by=y+4.6; [c.company, c.address, c.email, c.phone, c.gstin?'SST No. '+c.gstin:''].filter(Boolean).forEach(t=>String(t).split('\n').forEach(p=>d.splitTextToSize(p,95).forEach(l=>{d.text(l,M,by); by+=4.2;})));
-  if(i.shootDate){ d.text('Shoot '+fmtDate(i.shootDate), R, y+4.6+(d.splitTextToSize(i.project||'',70).length-1)*4.2, {align:'right'}); }
-  y=Math.max(by, y+10)+6;
-  const X={desc:M+2, qty:122, unit:126, rate:164, amt:R-2};
-  const header = ()=>{ d.setFillColor(243,242,246); d.rect(M,y-5,R-M,8,'F'); d.setFontSize(8.5); d.setTextColor(110); d.setFont('helvetica','bold'); d.text('DESCRIPTION',X.desc,y); d.text('QTY',X.qty,y,{align:'right'}); d.text('UNIT',X.unit,y); d.text('RATE',X.rate,y,{align:'right'}); d.text('AMOUNT',X.amt,y,{align:'right'}); d.setFont('helvetica','normal'); y+=8; };
+  const FONT = await loadInvoiceFonts(d); const bold='bold', reg='normal', med = FONT==='Poppins'?'medium':'normal';
+  const P = invParts(i); const L=12.5, R=197.7, LH=5.9;
+  const bg = ()=>{ try{ d.addImage(INVOICE_BG,'JPEG',0,0,210,297,'bg','FAST'); }catch(e){} };
+  const set = (style,size)=>{ d.setFont(FONT, style); d.setFontSize(size); d.setTextColor(17,17,17); };
+  bg();
+  // INVOICE
+  set(bold,53); d.text('INVOICE', L-0.5, 33.6);
+  // from (right)
+  let ry=23.6; P.from.forEach(r=>{ set(r.b?bold:reg,12.5); d.text(r.em?r.t:r.t.toUpperCase(), R, ry, {align:'right'}); ry+=LH; });
+  // billed to
+  let ly=47.2; set(bold,14.5); d.text('BILLED TO:', L, ly); ly+=6.5;
+  set(reg,12.5); P.billed.forEach(r=>{ d.splitTextToSize(r.em?r.t:r.t.toUpperCase(), 78).forEach(t=>{ d.text(t, L, ly); ly+=LH; }); });
+  // heading + dates
+  let hy = Math.max(ly, ry) + 10.5;
+  set(bold,24); const hl = d.splitTextToSize(P.heading.toUpperCase(), 125);
+  set(reg,15.5);
+  if(P.dates.length===2){ d.text(P.dates[0], R-2, hy+hl.length*0-9.2+ (hl.length-1)*9.5, {align:'right'}); d.text(P.dates[1], R-2, hy-1.6+(hl.length-1)*9.5, {align:'right'}); }
+  else d.text(P.dates[0], R-2, hy-3.6+(hl.length-1)*9.5, {align:'right'});
+  set(bold,24); hl.forEach((t,k)=>d.text(t, L+0.5, hy+k*9.5)); hy += (hl.length-1)*9.5;
+  // table
+  const C = {desc:L+3, price:110, qty:144, total:178};
+  let y = hy + 5;
+  const header = ()=>{ d.setDrawColor(17); d.setLineWidth(0.55); d.line(L, y, R, y); set(bold,12.5); const ty=y+8.4; d.text('DESCRIPTION', C.desc, ty); d.text('PRICE', C.price, ty, {align:'center'}); d.text(P.qtyLabel, C.qty, ty, {align:'center'}); d.text('TOTAL', C.total, ty, {align:'center'}); y+=13.6; d.setLineWidth(0.4); d.line(L, y, R, y); y+=8.6; };
   header();
-  (i.items||[]).forEach(it=>{
-    const desc = it.desc ? d.splitTextToSize(it.desc, 98) : [];
-    const h = 5 + desc.length*4.2 + 3;
-    if(y+h>268){ d.addPage(); y=22; header(); }
-    d.setFontSize(9.5); d.setTextColor(25); d.setFont('helvetica','bold'); d.text(roleOf(it.role).n, X.desc, y); d.setFont('helvetica','normal');
-    d.text(String(it.qty), X.qty, y, {align:'right'}); d.text(it.unit||'', X.unit, y); d.text(pdfMoney(it.rate), X.rate, y, {align:'right'}); d.text(pdfMoney(num(it.qty)*num(it.rate)), X.amt, y, {align:'right'});
-    d.setFontSize(8.5); d.setTextColor(110); desc.forEach((l,k)=>d.text(l, X.desc, y+4.6+k*4.2));
-    y += h; d.setDrawColor(232); d.line(M, y-3, R, y-3); y+=2;
+  set(med,12.2);
+  P.items.forEach(r=>{
+    const dl = d.splitTextToSize(r.desc, 87); const h = 8.07 + (dl.length-1)*6.1;
+    if(y + h > 262){ d.addPage(); bg(); y=20; header(); set(med,12.2); }
+    dl.forEach((t,k)=>d.text(t, C.desc, y + k*6.1));
+    const vy = y + (dl.length-1)*3.05;
+    d.text(r.price, C.price, vy, {align:'center'}); d.text(r.qty, C.qty, vy, {align:'center'}); d.text(r.total, C.total, vy, {align:'center'});
+    y += h;
   });
-  const rows=[['Subtotal',pdfMoney(T.sub)]];
-  if(T.disc) rows.push(['Discount','- '+pdfMoney(T.disc)]);
-  if(T.tax) rows.push([`SST ${num(i.taxRate)}%`,pdfMoney(T.tax)]);
-  if(y+40>275){ d.addPage(); y=22; }
-  y+=2; d.setFontSize(9.5);
-  rows.forEach(([k,v])=>{ d.setTextColor(95); d.text(k, R-62, y); d.setTextColor(25); d.text(v, R, y, {align:'right'}); y+=5.5; });
-  d.setDrawColor(200); d.line(R-62, y-2.5, R, y-2.5); y+=3;
-  d.setFont('helvetica','bold'); d.setFontSize(11); d.text('Total', R-62, y); d.text(pdfMoney(T.total), R, y, {align:'right'}); y+=6.5;
-  d.setFontSize(9.5);
-  if(i.status==='Paid'){ d.setTextColor(43,115,80); d.text('Paid in full', R, y, {align:'right'}); y+=6; }
-  else if(T.paid){ d.setFont('helvetica','normal'); d.setTextColor(95); d.text('Received', R-62, y); d.setTextColor(25); d.text('- '+pdfMoney(T.paid), R, y, {align:'right'}); y+=6; d.setFont('helvetica','bold'); d.text('Balance due', R-62, y); d.text(pdfMoney(T.balance), R, y, {align:'right'}); y+=6; }
-  d.setFont('helvetica','normal'); y+=6;
-  const pay=[s.accountName&&'Account name: '+s.accountName, s.bankName&&'Bank: '+s.bankName, s.accountNumber&&'Account no.: '+s.accountNumber, s.ifsc&&'SWIFT: '+s.ifsc, s.upi&&'DuitNow: '+s.upi].filter(Boolean);
-  if(pay.length){ if(y+8+pay.length*4.6>285){ d.addPage(); y=22; } d.setFontSize(8); d.setTextColor(120); d.text('PAYMENT DETAILS', M, y); y+=5; d.setFontSize(9.5); d.setTextColor(25); pay.forEach(p=>{ d.text(p, M, y); y+=4.6; }); y+=4; }
-  if(i.notes){ d.setFontSize(8.5); d.setTextColor(110); String(i.notes).split('\n').forEach(p=>d.splitTextToSize(p, R-M).forEach(l=>{ if(y>285){ d.addPage(); y=22; } d.text(l,M,y); y+=4; })); }
+  y = y - 8.07 + 5.9; d.setLineWidth(0.3); d.line(L, y, R, y);
+  // totals
+  const TL=140, TV=178, TX0=121.6; let ty = y + 6.8;
+  const need = 7*(P.totals.length + P.after.length) + 14;
+  if(ty + need > 285){ d.addPage(); bg(); ty = 25; }
+  P.totals.forEach(([k,v])=>{ set(bold,12.5); d.text(k, TL, ty, {align:'center'}); set(med,12.5); d.text(v, TV, ty, {align:'center'}); ty+=7; });
+  ty -= 2.9; d.setLineWidth(0.3); d.line(TX0, ty, R, ty); ty += 5.9;
+  set(bold,12.5); d.text('Total', TL, ty, {align:'center'}); d.text(money2(P.T.total), TV, ty, {align:'center'}); ty+=7;
+  P.after.forEach(([k,v])=>{ set(bold,12.5); d.text(k, TL, ty, {align:'center'}); set(med,12.5); d.text(v, TV, ty, {align:'center'}); ty+=7; });
+  // payment information (bottom left)
+  let py = Math.max(268.6, y + 14);
+  const notes = i.notes ? d.splitTextToSize(String(i.notes), R-L) : [];
+  if(py + 6.5 + P.pay.length*6.6 + notes.length*4 > 290){ if(y+14 > 260 || ty > 275){ d.addPage(); bg(); py = 25; } else py = Math.max(y+14, 290 - 6.5 - P.pay.length*6.6 - notes.length*4); }
+  if(P.pay.length){ set(bold,14.5); d.text('PAYMENT INFORMATION :', L, py); py += 9.6;
+    set(reg,12.5); P.pay.forEach(([k,v])=>{ d.text(k, L, py); d.text(':', 52.8, py); d.text(String(v), 60.3, py); py+=6.6; }); }
+  if(notes.length){ set(reg,9); d.setTextColor(60); py+=1; notes.forEach(t=>{ d.text(t, L, py); py+=4; }); }
   return d;
 }
 function saveFile(filename, data){
@@ -972,7 +1098,7 @@ async function downloadPdf(){
   const i = readInvoiceForm();
   const f = document.querySelector('[data-form=inv]'); if(f){ const sel=f.querySelector('[name=clientId]').value; if(sel!=='__new') i.clientId=sel; }
   if(!window.jspdf){ toast('The PDF tool didn\'t load. Check your connection and reload.'); return; }
-  const doc = makePdf(i); const name = (i.number||'invoice').replace(/[^\w.-]+/g,'_')+'.pdf';
+  toast('Preparing PDF…'); const doc = await makePdf(i); const name = (i.number||'invoice').replace(/[^\w.-]+/g,'_')+'.pdf';
   doc.save(name);
 }
 
@@ -1086,6 +1212,7 @@ function buildForms(d, which, copies){
   const head = (title, intro) => `<p class="pf-brand">${esc(d.studio.toUpperCase())}</p><div class="pf-title">${esc(title)}</div>${intro?`<p class="pf-intro">${esc(intro)}</p>`:''}`;
   const F = (label, v='') => `<div class="pf-f"><b>${esc(label)}</b><span class="v">${esc(v)}</span></div>`;
   const B = (label, v='', xl) => `<div class="pf-b${xl?' xl':''}"><b>${esc(label)}</b><div class="v">${esc(v)}</div></div>`;
+  const R = (label, v='') => `<div class="pf-b ruled"><b>${esc(label)}</b><div class="v">${esc(v)}</div></div>`;
   const H = t => `<div class="pf-h">${esc(t)}</div>`;
   const pages=[];
   if(which.includes('brief')){
@@ -1094,7 +1221,7 @@ function buildForms(d, which, copies){
       ${H('Client and commission')}${F('Client name',d.client)}${F('Phone or email',d.contact)}${F('Project reference',d.ref)}
       <table class="pf-t"><colgroup><col style="width:30%"><col></colgroup><tr><th>Garment</th><th>Description or notes</th></tr>${rows}</table>
       ${F('Occasion and event date',d.eventDate)}${F('Delivery deadline')}${F('Budget RM')}${F('Consultation date')}
-      ${H('Design preferences')}${B('Overall look and reference links','',1)}${B('Silhouette and fit','',1)}${B('Colours and fabric preferences','',1)}${B('Must have details','',1)}${B('Details to avoid and practical needs','',1)}</section>`);
+      ${H('Design preferences')}${B('Overall look and references:','',1)}${B('Silhouette and fit notes:','',1)}${B('Colours and fabric preferences:','',1)}${B('Must have details:','',1)}${B('Details to avoid and practical needs:','',1)}</section>`);
     const M=[['Height','Shoulder width'],['Bust or chest','Back width'],['Underbust','Armhole depth'],['Natural waist','Upper arm'],['High hip','Elbow'],['Full hip','Wrist'],['Shoulder to waist front','Sleeve length'],['Shoulder to waist back','Neck circumference'],['Bust point spacing','Shoulder to bust point'],['Waist to full hip','Inside leg'],['Thigh','Rise'],['Other','Other']];
     pages.push(`<section class="pf-page">${head('Body Measurements','Record body measurements in one consistent unit. Mark measurements that do not apply as N/A.')}
       ${F('Client name',d.client)}${F('Measured by and date')}${F('Unit cm or inches')}
@@ -1105,11 +1232,11 @@ function buildForms(d, which, copies){
     pages.push(`<section class="pf-page">${head('Design and Materials')}${F('Client and project reference',d.clientRef)}<div class="pf-sil"><img src="${SILHOUETTE}" alt=""></div></section>`);
     const mats=[['Main fabric',d.fabric,'',d.consumption],['Lining or support'],['Fastenings'],['Trims or embellishment'],['Other']];
     pages.push(`<section class="pf-page">${head('Design and Materials Notes','Record the final design details and materials to share with the maker.')}
-      ${F('Client and project reference',d.clientRef)}${F('Garment',d.garment)}${F('Maker',d.maker)}${F('Version and date','Version 1, '+d.today)}
-      ${H('Design details')}${B('Silhouette neckline sleeves and special details')}${B('Construction closures lining and finishing')}${B('Finished garment lengths and ease')}
+      ${F('Garment',d.garment)}${F('Tailor',d.maker)}${F('Version and date:','Version 1, '+d.today)}
+      ${H('Design details')}${R('Silhouette neckline sleeves and special details')}${R('Construction closures lining and finishing')}${B('Finished garment lengths and ease')}
       ${H('Materials')}<table class="pf-t tall"><colgroup><col style="width:22%"><col style="width:36%"><col style="width:22%"><col style="width:20%"></colgroup><tr><th>Material or trim</th><th>Specification and colour</th><th>Source</th><th>Quantity</th></tr>${mats.map(m=>`<tr><td>${m[0]}</td><td class="v">${esc(m[1]||'')}</td><td></td><td class="v">${esc(m[3]||'')}</td></tr>`).join('')}</table>
       <table class="pf-t pf-box"><tr><th style="width:50%">References</th><th>Fabric and colour swatches</th></tr><tr><td></td><td></td></tr></table>
-      ${F('Client supplied materials')}${F('Design approval and date')}</section>`);
+      ${F('Design approval and date :')}</section>`);
   }
   if(which.includes('costing')){
     const items=[['Main fabric',d.consumption,d.fabricCost],['Lining and support'],['Trims and fastenings','',d.trims],['Pattern making'],['Toile if required'],['Tailoring and sewing','',d.sewing],['Embroidery or embellishment'],['Fittings and alterations'],['Delivery or other expenses','',d.other],['Design fee'],['Contingency if included']];
@@ -1121,7 +1248,7 @@ function buildForms(d, which, copies){
       <tr><td><b>TOTAL</b></td><td></td><td class="v">${tot?'<b>'+rmv(tot)+'</b>':''}</td><td></td><td></td></tr></table>
       ${B('Costs awaiting confirmation or other notes','',1)}</section>`);
     pages.push(`<section class="pf-page">${head('Client Quotation','Custom garment quotation from '+d.studio+'.')}
-      ${F('Quotation reference and date',[d.ref,d.today].filter(Boolean).join(', '))}${F('Client name',d.client)}${F('Client contact',d.contact)}${F('Studio contact',d.studioContact)}
+      ${F('Quotation reference and date',[d.ref,d.today].filter(Boolean).join(', '))}${F('Client name',d.client)}${F('Client contact',d.contact)}
       ${H('Scope')}${B('Garment and included work or materials',d.garment)}${B('Number of fittings and alterations included')}${B('Exclusions and client supplied items')}
       <table class="pf-t tall"><colgroup><col><col style="width:28%"></colgroup><tr><th>Quoted item</th><th>Amount RM</th></tr><tr><td>Custom garment</td><td></td></tr><tr><td>Agreed extras</td><td></td></tr><tr><td><b>TOTAL</b></td><td></td></tr></table>
       ${H('Payment and delivery')}${F('Deposit RM and due date')}${F('Balance RM and due date')}${F('Payment method',d.pay)}${F('Fitting date')}${F('Delivery date')}${F('Quotation valid until')}
@@ -1130,9 +1257,9 @@ function buildForms(d, which, copies){
   if(which.includes('fitting')){
     for(let n=1;n<=copies;n++){
       pages.push(`<section class="pf-page">${head('Fitting and Alterations',"Use one copy per fitting. Mark photos to match the alteration notes and use the wearer's left and right.")}
-        ${F('Client and project reference',d.clientRef)}${F('Fitting date and session number',copies>1?`Session ${n}`:'')}${F('Garment stage')}${F('Maker',d.maker)}${F('Underwear and shoes worn')}
-        ${H('Alterations')}<table class="pf-t"><colgroup><col style="width:20%"><col><col style="width:12%"></colgroup><tr><th>Area</th><th>Adjustment and amount in cm or inches</th><th>Done</th></tr>${'<tr style="height:44px"><td></td><td></td><td></td></tr>'.repeat(6)}</table>
-        ${B('Client feedback or comfort concerns','',1)}
+        ${F('Client and project reference',d.clientRef)}${F('Fitting date and session number',copies>1?`Session ${n}`:'')}${F('Garment stage')}${F('Maker',d.maker)}
+        ${H('Alterations')}<table class="pf-t"><colgroup><col style="width:20%"><col><col style="width:12%"></colgroup><tr><th>Area</th><th>Adjustment and amount in cm or inches</th><th>Done</th></tr>${'<tr style="height:44px"><td></td><td></td><td></td></tr>'.repeat(5)}</table>
+        ${B('Client feedback or comfort concerns:','',1)}
         ${H('Next steps')}${F('Next fitting or completion date')}${F('Fit status')}${F('Client approval and date')}</section>`);
       pages.push(`<section class="pf-page">${head('Fitting Photos','Add fitting photos and mark the areas that correspond to the alteration notes.')}
         ${F('Client and project reference',d.clientRef)}${F('Fitting date')}
@@ -1158,7 +1285,7 @@ function openClient(cl){
   D={kind:'client', obj:c, isNew};
   const fld=(n,l,full)=>`<label class="f ${full?'full':''}">${l}<input class="inp" name="${n}" value="${esc(c[n])}"></label>`;
   const jobs = S.jobs.filter(j=>j.clientId===c.id);
-  openDrawer(isNew?'New client':c.name, `<form data-form="client" class="fgrid">${fld('name','Name',true)}${fld('company','Company or brand')}${fld('gstin','SST registration no.')}${fld('email','Email')}${fld('phone','Phone')}<label class="f full">Billing address<textarea class="inp" name="address">${esc(c.address)}</textarea></label><label class="f full">Notes<textarea class="inp" name="notes">${esc(c.notes)}</textarea></label>${jobs.length?`<div class="full"><fieldset><legend>Jobs</legend>${jobs.map(j=>jobRow(j)).join('')}</fieldset></div>`:''}</form>`,
+  openDrawer(isNew?'New client':c.name, `<form data-form="client" class="fgrid">${fld('name','Name',true)}${fld('company','Company or brand')}${fld('regNo','Company registration no.')}${fld('gstin','SST registration no.')}${fld('email','Email')}${fld('phone','Phone')}<label class="f full">Billing address<textarea class="inp" name="address">${esc(c.address)}</textarea></label><label class="f full">Notes<textarea class="inp" name="notes">${esc(c.notes)}</textarea></label>${jobs.length?`<div class="full"><fieldset><legend>Jobs</legend>${jobs.map(j=>jobRow(j)).join('')}</fieldset></div>`:''}</form>`,
     `${isNew?'':'<button class="btn danger ghost" data-act="delclient">Delete</button><button class="btn" data-act="client2cmt">Start CMT forms</button>'}<span class="spacer"></span><button class="btn primary" data-act="saveclient">Save client</button>`);
 }
 
@@ -1179,7 +1306,7 @@ document.addEventListener('click', async e=>{
     case 'deljob': if(confirm('Delete this job? Its invoices stay.')){ await Store.remove('jobs', D.obj.id); closeDrawer(); toast('Job deleted'); } break;
     case 'dupjob': { const src=clone(D.obj); const j=Object.assign(src,{id:newId(), title:src.title+' (copy)', start:today(), end:'', stage:'Enquiry', files:[]}); openJob(j); D.isNew=true; $('#dtitle').textContent='Copy of job'; toast('Copy ready. Edit and save it.'); } break;
     case 'job2inv': { const j = await saveJob(); if(j) openInvoice(null, j); } break;
-    case 'additem': $('#itemsBody').insertAdjacentHTML('beforeend', itemRow({})); recalcItems(); break;
+    case 'additem': { const tb=$('#itemsBody'); tb.insertAdjacentHTML('beforeend', itemRow({}, tb.dataset.mode)); const ins=tb.querySelectorAll('.irow'); const last=ins[ins.length-1].querySelector('input'); if(last) last.focus(); recalcItems(); } break;
     case 'addexp': $('#expBody').insertAdjacentHTML('beforeend', expRow({})); break;
     case 'delrow': a.closest('tr').remove(); recalcItems(); break;
     case 'delfile': { const f=D.files.splice(+a.dataset.i,1)[0]; $('#files').outerHTML = filesBlock(D.files).split('<div style="margin-top:10px">')[0];  } break;
@@ -1188,9 +1315,12 @@ document.addEventListener('click', async e=>{
     case 'saveinv': if(await saveInvoice()) closeDrawer(); break;
     case 'delinv': if(confirm('Delete this invoice?')){ await Store.remove('invoices', D.obj.id); closeDrawer(); toast('Invoice deleted'); } break;
     case 'previnv': { const i=readInvoiceForm(); const f=document.querySelector('[data-form=inv]'); const sel=f.querySelector('[name=clientId]').value; if(sel!=='__new') i.clientId=sel;
-      const back=clone(i); $('#dbody').innerHTML = invoiceHTML(i); $('#dfoot').innerHTML = '<button class="btn" data-act="backinv">Back to editing</button><span class="spacer"></span><button class="btn primary" data-act="pdfprev">Download PDF</button>'; D.preview=back; } break;
+      const back=clone(i); $('#dbody').innerHTML = `<div class="inv-wrap" id="invPrev">${invoiceHTML(i)}</div>`; $('#dfoot').innerHTML = '<button class="btn" data-act="backinv">Back to editing</button><span class="spacer"></span><button class="btn" data-act="printinv">Print</button><button class="btn primary" data-act="pdfprev">Download PDF</button>'; D.preview=back;
+      fitInvoicePreview(); if(document.fonts) document.fonts.ready.then(fitInvoicePreview); } break;
     case 'backinv': { const o=D.preview||D.obj; const isNew=D.isNew; openInvoice(o); D.isNew=isNew; } break;
-    case 'pdfprev': { const i=D.preview; const doc=makePdf(i); const name=(i.number||'invoice').replace(/[^\w.-]+/g,'_')+'.pdf'; doc.save(name); } break;
+    case 'printinv': printInvoice(D.preview); break;
+    case 'pdfprev': { const i=D.preview; if(!window.jspdf){ toast('The PDF tool didn\'t load. Reload the page.'); break; } toast('Preparing PDF…'); const doc=await makePdf(i); const name=(i.number||'invoice').replace(/[^\w.-]+/g,'_')+'.pdf'; doc.save(name); } break;
+    case 'dupinv': { const src=readInvoiceForm(); const n=clone(src); const d0=today(); Object.assign(n,{id:newId(), number:nextInvoiceNumber(), date:d0, due:src.due?addDays(d0, Math.max(0, Math.round((new Date(src.due)-new Date(src.date))/864e5))):'', status:'Draft', paidAmount:0, paidDate:'', jobId:''}); openInvoice(n); D.isNew=true; $('#dtitle').textContent='New invoice'; toast('Copied. Change the client and items, then save.'); } break;
     case 'pdfinv': downloadPdf(); break;
     case 'newlib': openLib(null); break;
     case 'lib': openLib(S.library.find(l=>l.id===id)); break;
@@ -1203,7 +1333,7 @@ document.addEventListener('click', async e=>{
     case 'duplib': { const src=clone(D.obj); openLib(Object.assign(src,{id:newId(), title:src.title+' (new version)', updated:'', scans:[], jobId:''})); D.isNew=true; toast('Copy ready. Edit and save it.'); } break;
     case 'newclient': openClient(null); break;
     case 'client': openClient(S.clients.find(c=>c.id===id)); break;
-    case 'saveclient': { const f=document.querySelector('[data-form=client]'); const c=D.obj; for(const n of ['name','company','gstin','email','phone','address','notes']) c[n]=f.querySelector(`[name=${n}]`).value.trim(); if(!c.name){ toast('Add a name.'); return; } try{ await Store.save('clients', c); toast('Client saved'); closeDrawer(); }catch(e){} } break;
+    case 'saveclient': { const f=document.querySelector('[data-form=client]'); const c=D.obj; for(const n of ['name','company','regNo','gstin','email','phone','address','notes']) c[n]=f.querySelector(`[name=${n}]`).value.trim(); if(!c.name){ toast('Add a name.'); return; } try{ await Store.save('clients', c); toast('Client saved'); closeDrawer(); }catch(e){} } break;
     case 'delclient': if(confirm('Delete this client? Jobs and invoices keep their records but lose the name.')){ await Store.remove('clients', D.obj.id); closeDrawer(); } break;
     case 'backup': exportBackup(); break;
     case 'restore': $('#restoreFile').click(); break;
@@ -1218,7 +1348,7 @@ document.addEventListener('input', e=>{
 });
 document.addEventListener('change', e=>{
   const t=e.target; const k=t.dataset.in;
-  if(k==='role'){ const tr=t.closest('tr'); const c=rateCard(t.value); const rate=tr.querySelector('[name=rate]'); if(!num(rate.value) && num(c.rate)) rate.value=c.rate; tr.querySelector('[name=unit]').value = c.unit || roleOf(t.value).unit; recalcItems(); }
+  if(k==='role'){ const tr=t.closest('tr'); const c=rateCard(t.value); const rate=tr.querySelector('[name=rate]'); const unit=tr.querySelector('[name=unit]'); if(unit){ if(!num(rate.value) && num(c.rate)) rate.value=c.rate; unit.value = c.unit || roleOf(t.value).unit; } recalcItems(); }
   else if(k==='clientsel'){ const n=t.parentElement.querySelector('[name=newClient]'); n.style.display = t.value==='__new'?'block':'none'; if(t.value==='__new') n.focus(); }
   else if(k==='calc'){ recalcItems(); }
   else if(k==='scanup'){ handleScanUpload(t); }
