@@ -2,7 +2,7 @@
 
 A simple dashboard for a working creative: track shoots across every role, keep a rate card, archive designs and CMT forms, and make SST-ready invoices as PDFs (Malaysia, in RM).
 
-**Open it here:** https://YOUR-GITHUB-USERNAME.github.io/studio-ledger/
+**Open it here:**
 
 No sign-up, no install. Open it in Chrome, Edge or Safari on your laptop.
 
